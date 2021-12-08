@@ -1,93 +1,120 @@
-# Conflict Resolver
+# Conflict Resolver Service
 
+It is a core element of the Conflict Resolution system in i3-MARKET. [Read more here](./conflict-resolution.md).
 
+## Endpoints
 
-## Getting started
+The Conflict-Resolver Service provides two endpoints: one for checking that the protocol was executed properly, and other one to initiate a dispute when a Consumer B claims that he cannot decrypt the cipherblock he has been invoiced for.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### ```POST /verification```
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Authenticated endpoint that can only be accessed by i3-MARKET Consumers.
 
-## Add your files
+#### Input
 
-- [ ] [Create](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+A valid PoR or PoP as a compact JSON Web Signature (JWS) should be POSTed to this endpoint. Either proof is enough to verify the data exchange and check if the secret was published to the ledger.
 
+```typescript
+{
+  por?: string // a the PoR in compact JWS format
+  pop?: string // a the PoP in compact JWS format
+}
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver.git
-git branch -M main
-git push -uf origin main
+
+#### Output
+
+It returns a signed resolution as a compact JWS with payload:
+
+```typescript
+{
+  dataExchangeId: string // the unique id of this data exchange
+  exchangeVerified: boolean // whether the completion of the data exchange has been verified
+  iat: nume // unix timestamp stating when it was verified
+  iss: string // the public key of the CRS in JWK
+}
 ```
 
-## Integrate with your tools
+### ```POST /dispute```
 
-- [ ] [Set up project integrations](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver/-/settings/integrations)
+Authenticated endpoint that can only be accessed by i3-MARKET Consumers.
 
-## Collaborate with your team
+#### Input
 
-- [ ] [Invite team members and collaborators](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```typescript
+{
+  por?: string // a the PoR in compact JWS format
+  pop?: string // a the PoP in compact JWS format
+  cipherblock: string // the cipherblock as a JWE string
+}
+```
 
-## Test and Deploy
+#### Output
 
-Use the built-in continuous integration in GitLab.
+It returns a signed resolution as a compact JWS with payload:
 
-- [ ] [Get started with GitLab CI/CD](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+```typescript
+{
+  dataExchangeId: string // the unique id of this data exchange
+  badDecryption: boolean // whether the cipherblock could be decrypted or not
+  iat: nume // unix timestamp stating when it was verified
+  iss: string // the public key of the CRS in JWK
+}
+```
 
-***
+## Set up the OIDC relying party
 
-# Editing this README
+If you haven't registered yet a client, point your browser to [https://identity1.i3-market.eu/developers/login](https://identity1.i3-market.eu/developers/login) and use the following credentials to get a valid initial access token for client registration:
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://gitlab.com/-/experiment/new_project_readme_content:fe252139af5f0e0851c262d6f5ebb464?https://www.makeareadme.com/) for this template.
+- username: `test@i3-market.eu`
+- password: `i3market`
+  
+Once you have a token, use Postman or any other application to generate POST to [https://identity1.i3-market.eu/oidc/reg](https://identity1.i3-market.eu/oidc/reg). The POST MUST use the token as an authorization bearer token, and the contents can be, e.g.:
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```json
+{
+   "application_type": "web",
+   "redirect_uris": ["https://mydomain.com/oidc/cb"],
+   "client_name": "Express OIDC RP Example",
+   "grant_types": [ "authorization_code" ],
+   "response_types": [ "code" ],
+   "token_endpoint_auth_method": "client_secret_jwt",
+   "id_token_signed_response_alg": "EdDSA"
+}
+```
 
-## Name
-Choose a self-explaining name for your project.
+The response will be something like:
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+```json
+{
+    "application_type": "web",
+    "grant_types": [
+        "authorization_code"
+    ],
+    "id_token_signed_response_alg": "EdDSA",
+    "post_logout_redirect_uris": [],
+    "require_auth_time": false,
+    "response_types": [
+        "code"
+    ],
+    "subject_type": "public",
+    "token_endpoint_auth_method": "client_secret_jwt",
+    "introspection_endpoint_auth_method": "client_secret_jwt",
+    "revocation_endpoint_auth_method": "client_secret_jwt",
+    "require_signed_request_object": false,
+    "request_uris": [],
+    "client_id_issued_at": 1613595853,
+    "client_id": "zUtIHIr2H0rZESiIYt9uj",
+    "client_name": "Express OIDC RP Example",
+    "client_secret_expires_at": 0,
+    "client_secret": "fJkWq2LeiD7nsgnD676LKRtFeReJo5rqriE5pcOrySHkv2t67eXviH4KU11ETrZJ_q45yQW137WEaPGJZ1jhtA",
+    "redirect_uris": [
+        "https://identity1.i3-market.eu/oidc/cb"
+    ],
+    "registration_client_uri": "https://identity1.i3-market.eu/oidc/reg/zUtIHIr2H0rZESiIYt9uj",
+    "registration_access_token": "FkhdFE37IIBv-AoQbotXZPRu6T2luw0upxPiDfTncXK"
+}
+```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Copy `config.template.ts` to `config.ts` and fill the OIDC client metadata from those received.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
-
+Point your browser to `/oidc/login/consumer` to init a consumer login process, or to `/oidc/login/provider` to init the provider one. You will need to download the i3Market wallet. Once the process is completed, you will get a valid access token that you can use as a bearer token to access the protected resource in `/claim`.

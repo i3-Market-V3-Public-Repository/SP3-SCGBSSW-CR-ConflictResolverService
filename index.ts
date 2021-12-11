@@ -1,27 +1,36 @@
 'use strict'
+// import crypto from 'crypto'
 import express from 'express'
-import session from 'express-session'
-import passportPromise from './passport'
+// import session from 'express-session'
 import http from 'http'
 import morgan from 'morgan'
-import routesPromise from './routes'
 import config from './config'
-import crypto from 'crypto'
+import passportPromise from './passport'
+import routesPromise from './routes'
 
 const main = async function (): Promise<void> {
   const app = express()
   const passport = await passportPromise()
 
-  app.use(session({
-    secret: crypto.randomBytes(32).toString('base64'),
-    resave: false,
-    saveUninitialized: false
-  }))
+  // app.use(session({
+  //   secret: crypto.randomBytes(32).toString('base64'),
+  //   resave: false,
+  //   saveUninitialized: false
+  // }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
   app.use(morgan('dev'))
   app.use(passport.initialize())
   // app.use(passport.session())
+
+  // Install the OpenApiValidator onto your express app
+  app.use((await import('./middlewares/openapi')).openApiValidatorMiddleware)
+
+  // Handle errors
+  app.use((await import('./middlewares/error')).errorMiddleware)
+
+  // Load CORS
+  app.use((await import('./middlewares/cors')).corsMiddleware)
 
   // Load routes
   app.use('/', await routesPromise())
@@ -42,4 +51,4 @@ const main = async function (): Promise<void> {
   })
 }
 
-main().catch(err => { throw new Error(err) })
+main().catch(err => { throw err })

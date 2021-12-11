@@ -1,0 +1,49 @@
+openapi: '3.0.2'
+
+info:
+  version: ''
+  title: ''
+
+paths:
+  /dispute:
+    post:
+      summary: initiate a dispute
+      operationId: dispute
+      x-eov-operation-handler: disputes
+      requestBody:
+        description: initiates a dispute
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DisputeInput"
+      responses:
+        "200":
+          description: the ID and type of the created account
+          content:
+            application/json:
+              schema:
+                $ref: "../schema/signed-resolution.yaml#/components/schemas/SignedResolution"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "../schema/error.yaml#/components/schemas/ApiError"
+
+components:
+  schemas:
+    DisputeInput:
+      title: DisputeInput
+      description: |
+        Expected input is a dispute request as a compact JSON Web Signature (JWS) along with the public key to verify it. For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
+      type: object
+      required:
+        - disputeRequest
+        - publicJwk
+      properties:
+        disputeRequest:
+          type: string
+        publicJwk:
+          type: string
+        

@@ -1,0 +1,18 @@
+openapi: '3.0.2'
+info:
+  title: '{{name}} API'
+  version: '{{version}}'
+  description: '{{description}}'
+  contact:
+    name: '{{author.name}}'
+    email: '{{author.email}}'
+  license:
+    name: '{{license}}'
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /verification:
+    $ref: './paths/verification.yaml#/paths/~1verification'
+  
+  /dispute:
+    $ref: './paths/dispute.yaml#/paths/~1dispute'

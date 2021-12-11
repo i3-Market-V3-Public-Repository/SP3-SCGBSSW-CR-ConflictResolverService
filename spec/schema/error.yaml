@@ -16,11 +16,10 @@ components:
       type: object
       title: Error
       required:
-        - code
-        - message
+        - name
+        - description
       properties:
-        code:
-          type: integer
-          format: int32
-        message:
+        name:
+          type: string
+        description:
           type: string

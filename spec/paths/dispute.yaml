@@ -9,7 +9,7 @@ paths:
     post:
       summary: initiate a dispute
       operationId: dispute
-      x-eov-operation-handler: disputes
+      x-eov-operation-handler: routes/dispute
       requestBody:
         description: initiates a dispute
         required: true
@@ -43,7 +43,7 @@ components:
         - publicJwk
       properties:
         disputeRequest:
-          type: string
+          $ref: "../schema/compact-jws.yaml#/components/schemas/CompactJWS"
         publicJwk:
           type: string
         

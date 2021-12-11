@@ -1,18 +1,28 @@
 openapi: '3.0.2'
 info:
-  title: '{{name}} API'
-  version: '{{version}}'
-  description: '{{description}}'
+  title: '{{pkgJson.name}} API'
+  version: '{{pkgJson.version}}'
+  description: '{{pkgJson.description}}'
   contact:
-    name: '{{author.name}}'
-    email: '{{author.email}}'
+    name: '{{pkgJson.author.name}}'
+    email: '{{pkgJson.author.email}}'
   license:
-    name: '{{license}}'
-servers:
-  - url: https://api.server.test/v1
+    name: '{{pkgJson.license}}'
 paths:
   /verification:
     $ref: './paths/verification.yaml#/paths/~1verification'
   
   /dispute:
     $ref: './paths/dispute.yaml#/paths/~1dispute'
+
+components:
+  securitySchemes:
+    BearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OpenIdConnect:
+      type: openIdConnect
+      openIdConnectUrl: {{openIdWellKnownUri}}
+
+      

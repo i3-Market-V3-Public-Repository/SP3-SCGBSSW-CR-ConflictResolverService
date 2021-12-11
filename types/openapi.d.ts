@@ -4,16 +4,20 @@ export namespace OpenApiComponents {
          * Error
          */
         export interface ApiError {
-            code: number // int32
-            message: string;
+            name: string;
+            description: string;
         }
+        /**
+         * CompactJWS
+         */
+        export type CompactJWS = string // ^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$
         /**
          * DisputeInput
          * Expected input is a dispute request as a compact JSON Web Signature (JWS) along with the public key to verify it. For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
          *
          */
         export interface DisputeInput {
-            disputeRequest: string;
+            disputeRequest: /* CompactJWS */ CompactJWS /* ^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$ */;
             publicJwk: string;
         }
         /**
@@ -34,7 +38,7 @@ export namespace OpenApiComponents {
              * ```
              *
              */
-            signedResolution: string;
+            signedResolution: any;
         }
         /**
          * VerificationInput
@@ -42,7 +46,7 @@ export namespace OpenApiComponents {
          *
          */
         export interface VerificationInput {
-            verificationRequest: string;
+            verificationRequest: /* CompactJWS */ CompactJWS /* ^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$ */;
             publicJwk: string;
         }
     }

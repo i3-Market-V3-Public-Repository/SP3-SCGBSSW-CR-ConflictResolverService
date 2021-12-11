@@ -9,7 +9,7 @@ paths:
     post:
       summary: verification request of completness of non-repudiation protocol regarding a data exchange
       operationId: verification
-      x-eov-operation-handler: verifications
+      x-eov-operation-handler: routes/verification
       requestBody:
         description: initiates a verification
         required: true
@@ -43,7 +43,7 @@ components:
         - publicJwk
       properties:
         verificationRequest:
-          type: string
+          $ref: "../schema/compact-jws.yaml#/components/schemas/CompactJWS"
         publicJwk:
           type: string
         

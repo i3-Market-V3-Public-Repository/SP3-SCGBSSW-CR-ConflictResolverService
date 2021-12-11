@@ -1,16 +1,17 @@
 import { randomFillSync } from 'crypto'
 import { ClientMetadata } from 'openid-client'
 import { config } from 'dotenv'
+import { existsSync } from 'fs'
+import { Replacement } from './build/replacements'
 
-config()
+if (existsSync('./.env')) config()
 
-const port = Number(process.env.PORT) ?? 3000
+const port = Number(process.env.PORT ?? 3000)
 const server = {
   addr: '0.0.0.0',
   port,
   publicUri: process.env.PUBLIC_URI ?? `http://localhost:${port}` // It SHOULD BE https when using a public server
 }
-
 interface OidcConfig {
   providerUri: string
   client: ClientMetadata
@@ -27,7 +28,6 @@ const oidcConfig: OidcConfig = {
     token_endpoint_auth_method: 'client_secret_jwt', // One of 'none' (only for PKCE), 'client_secret_basic', 'client_secret_jwt', 'client_secret_post', 'private_key_jwt'
     id_token_signed_response_alg: 'EdDSA' // One of 'HS256', 'PS256', 'RS256', 'ES256', 'EdDSA'
   }
-
 }
 
 const api = {
@@ -40,4 +40,11 @@ const jwt = {
   aud: server.addr
 }
 
-export default { server, oidc: oidcConfig, api, jwt }
+const customReplacements: Replacement[] = [
+  {
+    searchValue: 'openIdWellKnownUri',
+    replacement: oidcConfig.providerUri + '/.well-known/openid-configuration'
+  }
+]
+
+export default { server, oidc: oidcConfig, api, jwt, customReplacements }

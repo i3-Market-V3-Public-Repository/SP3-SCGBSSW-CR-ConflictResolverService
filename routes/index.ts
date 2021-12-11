@@ -1,5 +1,3 @@
-'use strict'
-
 import express from 'express'
 import passportPromise from '../passport'
 import dispute from './dispute'

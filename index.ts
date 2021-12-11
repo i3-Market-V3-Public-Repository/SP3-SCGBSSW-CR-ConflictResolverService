@@ -1,9 +1,11 @@
 'use strict'
 // import crypto from 'crypto'
-import express from 'express'
+import express, { Request, Response } from 'express'
 // import session from 'express-session'
 import http from 'http'
 import morgan from 'morgan'
+import { serve, setup } from 'swagger-ui-express'
+import apiSpec from './dist/spec/openapi.json'
 import config from './config'
 import passportPromise from './passport'
 import routesPromise from './routes'
@@ -23,17 +25,23 @@ const main = async function (): Promise<void> {
   app.use(passport.initialize())
   // app.use(passport.session())
 
-  // Install the OpenApiValidator onto your express app
+  // Serve openapi
+  app.use('/openapi.json', (req: Request, res: Response): void => {
+    res.json(apiSpec)
+  })
+  app.use('/spec', serve, setup(apiSpec))
+
+  // Install the OpenApiValidator for the routes
   app.use((await import('./middlewares/openapi')).openApiValidatorMiddleware)
 
-  // Handle errors
-  app.use((await import('./middlewares/error')).errorMiddleware)
-
-  // Load CORS
+  // Load CORS for the routes
   app.use((await import('./middlewares/cors')).corsMiddleware)
 
   // Load routes
   app.use('/', await routesPromise())
+
+  // Handle errors from all the previous
+  app.use((await import('./middlewares/error')).errorMiddleware)
 
   /**
    * Listen on .env SERVER_PORT or 3000/tcp, on all network interfaces.
@@ -48,6 +56,8 @@ const main = async function (): Promise<void> {
   server.on('listening', function (): void {
     console.log(`Listening on http://localhost:${config.server.port}`)
     console.log(`Listening on public ${config.server.publicUri}`)
+    console.log(`OpenAPI JSON spec at ${config.server.publicUri}/openapi.json`)
+    console.log(`OpenAPI browsable spec at ${config.server.publicUri}/spec`)
   })
 }
 

@@ -19,7 +19,7 @@ components:
         - signedResolution
       properties:
         signedResolution:
-          type: string
+          $ref: "./compact-jws.yaml#/components/schemas/CompactJWS"
           description: |
             A signed resolution object as a compact JWS signed by the CRS. The payload of a resolution is:
             

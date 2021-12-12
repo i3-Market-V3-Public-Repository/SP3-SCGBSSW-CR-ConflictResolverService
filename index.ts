@@ -1,12 +1,11 @@
-'use strict'
-// import crypto from 'crypto'
+import crypto from 'crypto'
 import express, { Request, Response } from 'express'
-// import session from 'express-session'
+import session from 'express-session'
 import http from 'http'
 import morgan from 'morgan'
 import { serve, setup } from 'swagger-ui-express'
-import apiSpec from './dist/spec/openapi.json'
 import config from './config'
+import apiSpec from './dist/spec/openapi.json'
 import passportPromise from './passport'
 import routesPromise from './routes'
 
@@ -14,11 +13,11 @@ const main = async function (): Promise<void> {
   const app = express()
   const passport = await passportPromise()
 
-  // app.use(session({
-  //   secret: crypto.randomBytes(32).toString('base64'),
-  //   resave: false,
-  //   saveUninitialized: false
-  // }))
+  app.use(session({
+    secret: crypto.randomBytes(32).toString('base64'),
+    resave: false,
+    saveUninitialized: false
+  }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
   app.use(morgan('dev'))

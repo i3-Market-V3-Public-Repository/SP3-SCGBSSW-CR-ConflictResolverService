@@ -1,10 +1,10 @@
-import { Router } from 'express'
+import { Request, Router } from 'express'
 import jwt, { decode } from 'jsonwebtoken'
 import { TokenSet } from 'openid-client'
 import { PassportStatic } from 'passport'
 import util from 'util'
-
 import config from '../config'
+import { OpenApiPaths } from '../types'
 
 export default function oidc (router: Router, passport: PassportStatic): void {
   router.get('/oidc/login/provider',
@@ -16,7 +16,7 @@ export default function oidc (router: Router, passport: PassportStatic): void {
   )
 
   router.get('/oidc/cb', passport.authenticate('oidc', { session: false }),
-    function (req, res) {
+    function (req: Request<{}, OpenApiPaths.OidcCb.Get.Responses.$200>, res) {
       if (req.user === undefined) throw new Error('token not received')
       const tokenSet = req.user as TokenSet
 
@@ -28,7 +28,12 @@ export default function oidc (router: Router, passport: PassportStatic): void {
 
       const jwt = _createJwt({ sub: tokenSet.claims().sub, scope: tokenSet.scope ?? '' })
 
-      res.json({ type: 'jwt', jwt })
+      const response: OpenApiPaths.OidcCb.Get.Responses.$200 = {
+        jwtBearerToken: jwt,
+        allowedEndpoints: ['/dispute', '/verification'] // TO-DO: Fix this. Providers do not have access to /dispute
+      }
+
+      res.json(response)
     }
   )
 }

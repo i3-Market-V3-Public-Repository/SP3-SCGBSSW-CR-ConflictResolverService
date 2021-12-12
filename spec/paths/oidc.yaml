@@ -1,0 +1,80 @@
+openapi: '3.0.2'
+
+info:
+  version: ''
+  title: ''
+
+paths:
+  /oidc/login/consumer:
+    get:
+      summary: starts a OIDC login flow for getting a valid JWT bearer token for an i3-MARKET consumer
+      responses:
+        "302":
+          description: redirection to the OIDC server auth endpoint
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "../schema/error.yaml#/components/schemas/ApiError"
+  
+  /oidc/login/provider:
+    get:
+      summary: starts a OIDC login flow for getting a valid JWT bearer token for an i3-MARKET provider
+      responses:
+        "302":
+          description: redirection to the OIDC server auth endpoint
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "../schema/error.yaml#/components/schemas/ApiError"
+
+  /oidc/cb:
+    get:
+      summary: OIDC callback endpoint that will retrieve the access token and te ID token and provide an API JWT bearer token
+      security:
+        - OpenIdConnect:
+          - 'vc:consumer'
+          - 'vc:provider'
+      responses:
+        "200":
+          description: an API JWT bearer token to use to access the protected resources
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OidcCbOutput"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "../schema/error.yaml#/components/schemas/ApiError"
+
+components:
+  securitySchemes:
+    OpenIdConnect:
+      type: openIdConnect
+      openIdConnectUrl: '{{openIdWellKnownUri}}'
+  
+  schemas:
+    OidcCbOutput:
+      title: OidcCbOutput
+      description: |
+        An API JWT bearer token that provides access to protected endpoints
+      type: object
+      required:
+        - disputeRequest
+        - publicJwk
+      properties:
+        jwtBearerToken:
+          $ref: "../schema/compact-jws.yaml#/components/schemas/CompactJWS"
+        allowedEndpoints:
+          type: array
+          items:
+            type: string
+            enum:
+              - /verification
+              - /dispute
+      

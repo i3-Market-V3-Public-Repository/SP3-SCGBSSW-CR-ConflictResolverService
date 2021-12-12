@@ -21,6 +21,15 @@ export namespace OpenApiComponents {
             publicJwk: string;
         }
         /**
+         * OidcCbOutput
+         * An API JWT bearer token that provides access to protected endpoints
+         *
+         */
+        export interface OidcCbOutput {
+            jwtBearerToken?: /* CompactJWS */ CompactJWS /* ^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$ */;
+            allowedEndpoints?: ("/verification" | "/dispute")[];
+        }
+        /**
          * SignedResolution
          */
         export interface SignedResolution {
@@ -62,6 +71,37 @@ export namespace OpenApiPaths {
         export namespace Responses {
             export type $200 = /* SignedResolution */ OpenApiComponents.Schemas.SignedResolution;
             export type Default = /* Error */ OpenApiComponents.Schemas.ApiError;
+        }
+    }
+    export namespace OidcCb {
+        export namespace Get {
+            export namespace Responses {
+                export type $200 = /**
+                 * OidcCbOutput
+                 * An API JWT bearer token that provides access to protected endpoints
+                 *
+                 */
+                OpenApiComponents.Schemas.OidcCbOutput;
+                export type Default = /* Error */ OpenApiComponents.Schemas.ApiError;
+            }
+        }
+    }
+    export namespace OidcLoginConsumer {
+        export namespace Get {
+            export namespace Responses {
+                export interface $302 {
+                }
+                export type Default = /* Error */ OpenApiComponents.Schemas.ApiError;
+            }
+        }
+    }
+    export namespace OidcLoginProvider {
+        export namespace Get {
+            export namespace Responses {
+                export interface $302 {
+                }
+                export type Default = /* Error */ OpenApiComponents.Schemas.ApiError;
+            }
         }
     }
     export namespace Verification {

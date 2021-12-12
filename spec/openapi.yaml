@@ -15,6 +15,12 @@ paths:
   /dispute:
     $ref: './paths/dispute.yaml#/paths/~1dispute'
 
+  /oidc/login/consumer:
+    $ref: './paths/oidc.yaml#/paths/~1oidc~1login~1consumer'
+
+  /oidc/login/provider:
+    $ref: './paths/oidc.yaml#/paths/~1oidc~1login~1provider'
+
 components:
   securitySchemes:
     BearerAuth:            # arbitrary name for the security scheme
@@ -23,6 +29,4 @@ components:
       bearerFormat: JWT
     OpenIdConnect:
       type: openIdConnect
-      openIdConnectUrl: {{openIdWellKnownUri}}
-
-      
+      openIdConnectUrl: '{{openIdWellKnownUri}}'

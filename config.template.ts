@@ -1,13 +1,17 @@
 import { randomFillSync } from 'crypto'
 import { ClientMetadata } from 'openid-client'
+import { config } from 'dotenv'
+import { existsSync } from 'fs'
+import { Replacement } from './build/replacements'
 
-const port = Number(process.env.PORT) ?? 3000
+if (existsSync('./.env')) config()
+
+const port = Number(process.env.PORT ?? 3000)
 const server = {
   addr: '0.0.0.0',
   port,
   publicUri: process.env.PUBLIC_URI ?? `http://localhost:${port}` // It SHOULD BE https when using a public server
 }
-
 interface OidcConfig {
   providerUri: string
   client: ClientMetadata
@@ -15,8 +19,8 @@ interface OidcConfig {
 const oidcConfig: OidcConfig = {
   providerUri: 'https://identity1.i3-market.eu/oidc',
   client: {
-    client_id: '<my_client_id>',
-    client_secret: '<my_client_secret>',
+    client_id: process.env.CLIENT_ID as string,
+    client_secret: process.env.CLIENT_SECRET as string,
     redirect_uris: [`${server.publicUri}/oidc/cb`],
     application_type: 'web',
     grant_types: ['authorization_code'],
@@ -36,4 +40,11 @@ const jwt = {
   aud: server.addr
 }
 
-export default { server, oidc: oidcConfig, api, jwt }
+const customReplacements: Replacement[] = [
+  {
+    searchValue: 'openIdWellKnownUri',
+    replacement: oidcConfig.providerUri + '/.well-known/openid-configuration'
+  }
+]
+
+export default { server, oidc: oidcConfig, api, jwt, customReplacements }

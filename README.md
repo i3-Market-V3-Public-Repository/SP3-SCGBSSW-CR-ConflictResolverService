@@ -4,6 +4,9 @@
 
 # Conflict Resolver Service
 
+
+The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about the non-repudiation protocol associated to an invoice being valid or invalid. It could be invoked by either the consumer or the provider.
+
 It is a core element of the Conflict Resolution system in i3-MARKET. [Read more here](./conflict-resolution.md).
 
 ## Endpoints

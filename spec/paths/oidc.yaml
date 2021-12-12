@@ -7,6 +7,8 @@ info:
 paths:
   /oidc/login/consumer:
     get:
+      tags:
+        - OpenID Connect
       summary: starts a OIDC login flow for getting a valid JWT bearer token for an i3-MARKET consumer
       responses:
         "302":
@@ -20,6 +22,8 @@ paths:
   
   /oidc/login/provider:
     get:
+      tags:
+        - OpenID Connect
       summary: starts a OIDC login flow for getting a valid JWT bearer token for an i3-MARKET provider
       responses:
         "302":
@@ -33,6 +37,8 @@ paths:
 
   /oidc/cb:
     get:
+      tags:
+        - OpenID Connect
       summary: OIDC callback endpoint that will retrieve the access token and te ID token and provide an API JWT bearer token
       security:
         - OpenIdConnect:

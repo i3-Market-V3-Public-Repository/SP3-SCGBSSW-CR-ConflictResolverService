@@ -7,6 +7,8 @@ info:
 paths:
   /dispute:
     post:
+      tags:
+        - Protected
       summary: initiate a dispute
       operationId: dispute
       x-eov-operation-handler: routes/dispute

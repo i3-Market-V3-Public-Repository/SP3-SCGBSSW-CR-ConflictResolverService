@@ -91,9 +91,9 @@ It returns a signed resolution as a compact JWS with payload:
 }
 ```
 
-## Set up the OIDC relying party
+## Set up the service
 
-If you haven't registered yet a client, point your browser to [https://identity1.i3-market.eu/developers/login](https://identity1.i3-market.eu/developers/login) and use the following credentials to get a valid initial access token for client registration:
+If you haven't registered yet an OIDC client, point your browser to [https://identity1.i3-market.eu/developers/login](https://identity1.i3-market.eu/developers/login) and use the following credentials to get a valid initial access token for client registration:
 
 - username: `test@i3-market.eu`
 - password: `i3market`
@@ -145,6 +145,10 @@ The response will be something like:
 }
 ```
 
-Copy `config.template.ts` to `config.ts` and fill the OIDC client metadata from those received.
+Copy `env.template` to `.env` and fill the OIDC client metadata from those received, basically set `CLIENT_ID` to received `client_id`, `CLIENT_SECRET` to `client_secret`, and `TOKEN_SIGNING_ALG` to `id_token_signed_response_alg`. 
 
-Point your browser to `/oidc/login/consumer` to init a consumer login process, or to `/oidc/login/provider` to init the provider one. You will need to download the i3Market wallet. Once the process is completed, you will get a valid access token that you can use as a bearer token to access the protected resource in `/claim`.
+Besides the OIDC you may need to define the public uri of your server, since it is likely that you run this service behind a TLS reverse proxy. Just set `PUBLIC_URI` to your server address.
+
+> If you find it more convenient, you can pass the previous variables as environment variables to node instead of using the `.env` file.
+
+Point your browser to `/oidc/login/consumer` to init a consumer login process, or to `/oidc/login/provider` to init the provider one. You will need to download the i3Market wallet. Once the process is completed, you will get a valid access token that you can use as a bearer token to access the protected endpoints `/verification` and `/dispute`.

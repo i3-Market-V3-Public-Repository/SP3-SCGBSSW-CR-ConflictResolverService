@@ -9,7 +9,13 @@
   },
   "license": "EUPL-1.2",
   "repository": "gitlab:i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver-service",
-  "keywords": [],
+  "keywords": [
+    "conflict resolution",
+    "conflict",
+    "non-repudiation",
+    "i3-MARKET",
+    "i3m"
+  ],
   "main": "./dist/index.js",
   "directories": {
     "build": "./build",

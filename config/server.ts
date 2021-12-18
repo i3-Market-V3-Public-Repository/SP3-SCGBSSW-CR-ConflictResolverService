@@ -1,5 +1,6 @@
 import { config as loadEnvFile } from 'dotenv'
 import { existsSync } from 'fs'
+import { nullish } from './nullish'
 
 if (existsSync('./.env')) loadEnvFile()
 interface ServerConfig {
@@ -12,5 +13,5 @@ const port = Number(process.env.PORT ?? 3000)
 export const server: ServerConfig = {
   addr: '0.0.0.0',
   port,
-  publicUri: process.env.PUBLIC_URI ?? `http://localhost:${port}` // It SHOULD BE https when using a public server
+  publicUri: nullish(process.env.PUBLIC_URI) ? `http://localhost:${port}` : process.env.PUBLIC_URI as string // It SHOULD BE https when using a public server
 }

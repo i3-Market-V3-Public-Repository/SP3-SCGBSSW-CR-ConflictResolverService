@@ -4,7 +4,7 @@ import { TokenSet } from 'openid-client'
 import { PassportStatic } from 'passport'
 import util from 'util'
 import { jwt as jwtConfig } from '../config'
-import { OpenApiPaths } from '../types'
+import { OpenApiPaths } from '../types/openapi'
 
 export default function oidc (router: Router, passport: PassportStatic): void {
   router.get('/oidc/login/provider',

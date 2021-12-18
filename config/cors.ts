@@ -1,8 +1,4 @@
-import { config as loadEnvFile } from 'dotenv'
-import { existsSync } from 'fs'
 import { server } from './server'
-
-if (existsSync('./.env')) loadEnvFile()
 
 interface CorsConfig {
   allowedOrigin: string

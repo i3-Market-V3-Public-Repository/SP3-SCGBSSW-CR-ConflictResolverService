@@ -20,12 +20,11 @@ This endpoint can be accessed at `POST /verification` and is requires valid i3-M
 
 #### Input
 
-A verification request as a compact JSON Web Signature (JWS) along with the public key to verify it. For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
+A verification request as a compact JSON Web Signature (JWS). For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
 
 ```typescript
 {
   verificationRequest: string // the verification request in compact JWS format
-  publicJwk: string // the public key of the signer of the verification request in JWK. It should match one of the public JWKs in the data exchange, either 'orig' or 'dest'
 }
 ```
 
@@ -34,9 +33,11 @@ A verification request is a JWS signed by either the consumer or the provider us
 ```typescript
 {
   type: 'verificationRequest'
+  proofType: 'request'
   iss: 'orig' | 'dest'
   iat: number // unix timestamp for issued at
-  por: string // a compact JWS holding a valid PoR. The por's exchange.orig or exchange.dest shold point to a public key that can be used to verify this verificationRequest
+  por: string // a compact JWS holding a PoR. The proof MUST be signed with the same key as either 'orig' or 'dest' of the payload proof.
+  dataExchangeId: string // the unique id of this data exchange
 }
 ```
 
@@ -46,11 +47,13 @@ It returns a signed resolution as a compact JWS with payload:
 
 ```typescript
 {
+  proofType: 'resolution'
   type: 'verification'
-  dataExchangeId: string // the unique id of this data exchange
   resolution: 'completed' | 'not completed' // whether the data exchange has been verified to be complete
-  iat: nume // unix timestamp stating when it was verified
+  dataExchangeId: string // the unique id of this data exchange
+  iat: number // unix timestamp stating when it was resolved
   iss: string // the public key of the CRS in JWK
+  sub: string // the public key (JWK) of the entity that requested a resolution
 }
 ```
 
@@ -65,21 +68,22 @@ All this is handled in this endpoint, which can only be queried if in possession
 ```typescript
 {
   disputeRequest: string // the dispute request in compact JWS format
-  publicJwk: string // the public key of the signer of the dispute request as a JWK. It should match the public JWK 'dest' in the data exchange
 }
 ```
 
-A dispute request as a compact JSON Web Signature (JWS) along with the public key to verify it. For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
+A dispute request as a compact JSON Web Signature (JWS). For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
 
 The payload of a decoded `disputeRequest` holds a valid PoR, and the received cipherblock:
 
 ```typescript
 {
+  proofType: 'request'
   type: 'disputeRequest'
   iss: 'dest'
-  iat: number // unix timestamp for issued at
-  por: string // a compact JWS holding a valid PoR. The por's exchange.orig or exchange.dest shold point to a public key that can be used to verify this verificationRequest
   cipherblock: string // the cipherblock as a JWE string
+  iat: number // unix timestamp for issued at
+  por: string // a compact JWS holding a PoR. The proof MUST be signed with the same key as either 'orig' or 'dest' of the payload proof.
+  dataExchangeId: string // the unique id of this data exchange
 }
 ```
 
@@ -89,22 +93,24 @@ It returns a signed resolution as a compact JWS with payload:
 
 ```typescript
 {
+  proofType: 'resolution'
   type: 'dispute'
-  dataExchangeId: string // the unique id of this data exchange
   resolution: 'accepted' | 'denied' // resolution is 'denied' if the cipherblock can be properly decrypted; otherwise is 'accepted'
-  iat: number // unix timestamp stating when it was verified
+  dataExchangeId: string // the unique id of this data exchange
+  iat: number // unix timestamp stating when it was resolved
   iss: string // the public key of the CRS in JWK
+  sub: string // the public key (JWK) of the entity that requested a resolution
 }
 ```
 
 ## Set up the service
 
-If you haven't registered yet an OIDC client, point your browser to [https://identity1.i3-market.eu/developers/login](https://identity1.i3-market.eu/developers/login) and use the following credentials to get a valid initial access token for client registration:
+If you haven't registered yet an OIDC client, point your browser to [https://identity1.i3-market.eu/release2/developers/login](https://identity1.i3-market.eu/release2/developers/login) and use the following credentials to get a valid initial access token for client registration:
 
 - username: `test@i3-market.eu`
 - password: `i3market`
   
-Once you have a token, use Postman or any other application to generate POST to [https://identity1.i3-market.eu/oidc/reg](https://identity1.i3-market.eu/oidc/reg). The POST MUST use the token as an authorization bearer token, and the contents can be, e.g.:
+Once you have a token, use Postman or any other application to generate POST to [https://identity1.i3-market.eu/release2/oidc/reg](https://identity1.i3-market.eu/release2/oidc/reg). The POST MUST use the token as an authorization bearer token, and the contents can be, e.g.:
 
 ```json
 {
@@ -144,14 +150,19 @@ The response will be something like:
     "client_secret_expires_at": 0,
     "client_secret": "fJkWq2LeiD7nsgnD676LKRtFeReJo5rqriE5pcOrySHkv2t67eXviH4KU11ETrZJ_q45yQW137WEaPGJZ1jhtA",
     "redirect_uris": [
-        "https://identity1.i3-market.eu/oidc/cb"
+        "https://identity1.i3-market.eu/release2/oidc/cb"
     ],
-    "registration_client_uri": "https://identity1.i3-market.eu/oidc/reg/zUtIHIr2H0rZESiIYt9uj",
+    "registration_client_uri": "https://identity1.i3-market.eu/release2/oidc/reg/zUtIHIr2H0rZESiIYt9uj",
     "registration_access_token": "FkhdFE37IIBv-AoQbotXZPRu6T2luw0upxPiDfTncXK"
 }
 ```
 
-Copy `env.template` to `.env` and fill the OIDC client metadata from those received, basically set `CLIENT_ID` to received `client_id`, `CLIENT_SECRET` to `client_secret`, and `TOKEN_SIGNING_ALG` to `id_token_signed_response_alg`. 
+Copy `env.template` to `.env` and fill the OIDC client metadata from those received, and set:
+
+- `OIDC_PROVIDER_URI` to `https://identity1.i3-market.eu/release2/oidc`,
+- `OIDC_CLIENT_ID` to received `client_id`,
+- `OIDC_CLIENT_SECRET` to `client_secret`,
+- `TOKEN_SIGNING_ALG` to `id_token_signed_response_alg`. 
 
 Besides the OIDC you may need to define the public uri of your server, since it is likely that you run this service behind a TLS reverse proxy. Just set `PUBLIC_URI` to your server address.
 

@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: conflict-resolver-service API
-  version: 1.0.0
+  version: 0.9.1
   description: >-
     The Conflict-Resolver Service (CSR) can be queried to provide a signed
     resolution about the non-repudiation protocol associated to an invoice being

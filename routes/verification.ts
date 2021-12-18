@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import { PassportStatic } from 'passport'
-import { OpenApiPaths } from '../types'
+import { OpenApiPaths } from '../types/openapi'
 import crsPromise from '../conflictResolver'
 
 export default function verification (router: Router, passport: PassportStatic): void {

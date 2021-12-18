@@ -3,7 +3,7 @@ stages:
 
 build:
   stage: build
-  image: node:$NODE_VERSION
+  image: node:lts
   script:
     - npm ci
     - npm run build

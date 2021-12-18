@@ -87,7 +87,7 @@ function makeOpenApiWorkWithOurOidc (): void {
   }
   const replacements: Replacement[] = [
     {
-      searchValue: '{{openIdWellKnownUri}}',
+      searchValue: 'openIdWellKnownUri',
       replacement: oidc.providerUri + '/.well-known/openid-configuration'
     }
   ]

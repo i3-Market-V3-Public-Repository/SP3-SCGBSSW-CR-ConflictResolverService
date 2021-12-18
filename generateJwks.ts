@@ -23,7 +23,8 @@ function nullish (a: string | undefined): boolean {
 }
 
 generateKeys(alg, privateKeyHex).then((jwkPair) => {
-  console.log(jwkPair)
+  console.log('PRIVATE_JWK=' + JSON.stringify(jwkPair.privateJwk))
+  console.log('PUBLIC_JWK=' + JSON.stringify(jwkPair.publicJwk))
 }).catch(() => {
   error()
 })

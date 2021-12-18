@@ -1,16 +1,10 @@
 import { config as loadEnvFile } from 'dotenv'
 import { existsSync } from 'fs'
 import * as _ from 'lodash'
-import { oidc } from '../config/oidc'
 import * as pkgJson from '../package.json'
 
 if (existsSync('./.env')) loadEnvFile()
-export const defaultReplacements: Replacement[] = [
-  {
-    searchValue: 'openIdWellKnownUri',
-    replacement: oidc.providerUri + '/.well-known/openid-configuration'
-  }
-]
+export const defaultReplacements: Replacement[] = []
 
 export interface Replacement {
   searchValue: string

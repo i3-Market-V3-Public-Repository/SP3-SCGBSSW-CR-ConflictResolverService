@@ -10,6 +10,12 @@ import apiSpec from './spec/openapi.json'
 import passportPromise from './passport'
 import routesPromise from './routes'
 
+import { oidc } from './config/oidc'
+import { readFileSync, writeFileSync } from 'fs'
+import { join } from 'path/posix'
+
+const rootDir = join(__dirname, '..')
+
 async function startApp (): Promise<Express> {
   const app = express()
   const passport = await passportPromise
@@ -47,6 +53,8 @@ async function startApp (): Promise<Express> {
 }
 
 const serverPromise = new Promise<http.Server>((resolve, reject) => {
+  makeOpenApiWorkWithOurOidc()
+
   startApp().then((app) => {
   /**
    * Listen on .env SERVER_PORT or 3000/tcp, on all network interfaces.
@@ -71,3 +79,28 @@ const serverPromise = new Promise<http.Server>((resolve, reject) => {
 })
 
 export default serverPromise
+
+function makeOpenApiWorkWithOurOidc (): void {
+  interface Replacement {
+    searchValue: string
+    replacement: string
+  }
+  const replacements: Replacement[] = [
+    {
+      searchValue: '{{openIdWellKnownUri}}',
+      replacement: oidc.providerUri + '/.well-known/openid-configuration'
+    }
+  ]
+  const openApiJsonPath = join(rootDir, 'spec', 'openapi.json')
+  let openApiJson = readFileSync(openApiJsonPath, 'utf-8')
+  const openApiYamlPath = join(rootDir, 'spec', 'openapi.yaml')
+  let openApiYaml = readFileSync(openApiYamlPath, 'utf-8')
+
+  for (const replacement of replacements) {
+    const regex = new RegExp(replacement.searchValue, 'g')
+    openApiJson = openApiJson.replace(regex, replacement.replacement)
+    openApiYaml = openApiYaml.replace(regex, replacement.replacement)
+  }
+  writeFileSync(openApiJsonPath, openApiJson)
+  writeFileSync(openApiYamlPath, openApiYaml)
+}

@@ -66,9 +66,11 @@ const bundle = async (): Promise<void> => {
   fs.writeFileSync(jsonBundle, JSON.stringify(api, undefined, 2))
   console.info(`\x1b[32mOpenAPI Spec JSON bundle written to -> ${jsonBundle}\x1b[0m`)
 
-  const yamlBundle = path.join(rootDir, 'dist', 'spec', 'openapi.yaml')
-  fs.mkdirSync(path.dirname(yamlBundle), { recursive: true })
+  const yamlBundle = path.join(rootDir, 'spec', 'openapi.yaml')
+  const yamlBundleDist = path.join(rootDir, 'dist', 'spec', 'openapi.yaml') // tsc does not automatically copy .yaml to dist/spec
+  fs.mkdirSync(path.dirname(yamlBundleDist), { recursive: true })
   fs.writeFileSync(yamlBundle, jsYaml.dump(api))
+  fs.writeFileSync(yamlBundleDist, jsYaml.dump(api))
   console.info(`\x1b[32mOpenAPI Spec YAML bundle written to -> ${yamlBundle}\x1b[0m`)
 }
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import crypto from 'crypto'
 import express, { Request, Response } from 'express'
 import { Express } from 'express-serve-static-core'
@@ -74,6 +75,7 @@ const serverPromise = new Promise<http.Server>((resolve, reject) => {
       resolve(server)
     })
   }).catch((e) => {
+    console.log(e)
     reject(e)
   })
 })

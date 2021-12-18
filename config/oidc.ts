@@ -25,6 +25,6 @@ export const oidc: OidcConfig = {
     grant_types: ['authorization_code'],
     response_types: ['code'],
     token_endpoint_auth_method: 'client_secret_jwt', // One of 'none' (only for PKCE), 'client_secret_basic', 'client_secret_jwt', 'client_secret_post', 'private_key_jwt'
-    id_token_signed_response_alg: process.env.TOKEN_SIGNING_ALG ?? 'EdDSA' // One of 'HS256', 'PS256', 'RS256', 'ES256', 'EdDSA'
+    id_token_signed_response_alg: nullish(process.env.OIDC_TOKEN_SIGNING_ALG) ? 'EdDSA' : process.env.OIDC_TOKEN_SIGNING_ALG // One of 'HS256', 'PS256', 'RS256', 'ES256', 'EdDSA'
   }
 }

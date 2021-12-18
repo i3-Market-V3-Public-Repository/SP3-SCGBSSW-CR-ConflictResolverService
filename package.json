@@ -25,6 +25,10 @@
     "i3m"
   ],
   "main": "./dist/index.js",
+  "bin": {
+    "crs": "./dist/index.js",
+    "generateJwks": "./dist/generateJwks.js"
+  },
   "directories": {
     "build": "./build",
     "dist": "./dist",

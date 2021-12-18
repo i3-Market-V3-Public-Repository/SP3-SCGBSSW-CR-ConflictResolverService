@@ -8,10 +8,10 @@ interface ServerConfig {
   port: number
   publicUri: string
 }
-const port = Number(process.env.PORT ?? 3000)
+const port = Number(process.env.SERVER_PORT ?? 3000)
 
 export const server: ServerConfig = {
-  addr: '0.0.0.0',
+  addr: nullish(process.env.SERVER_ADDRESS) ? '0.0.0.0' : process.env.SERVER_ADDRESS as string,
   port,
-  publicUri: nullish(process.env.PUBLIC_URI) ? `http://localhost:${port}` : process.env.PUBLIC_URI as string // It SHOULD BE https when using a public server
+  publicUri: nullish(process.env.SERVER_PUBLIC_URI) ? `http://localhost:${port}` : process.env.SERVER_PUBLIC_URI as string // It SHOULD BE https when using a public server
 }

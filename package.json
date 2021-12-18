@@ -8,8 +8,16 @@
     "url": "https://github.com/juanelas"
   },
   "license": "EUPL-1.2",
-  "repository": "gitlab:i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver-service",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver-service.git"
+  },
+  "bugs": {
+    "url": "https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver-service/issues"
+  },
+  "homepage": "https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver-service#readme",
   "keywords": [
+    "crs",
     "conflict resolution",
     "conflict",
     "non-repudiation",

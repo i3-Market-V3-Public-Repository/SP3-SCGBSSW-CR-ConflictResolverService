@@ -3,7 +3,7 @@ import jwt, { decode } from 'jsonwebtoken'
 import { TokenSet } from 'openid-client'
 import { PassportStatic } from 'passport'
 import util from 'util'
-import config from '../config'
+import { jwt as jwtConfig } from '../config'
 import { OpenApiPaths } from '../types'
 
 export default function oidc (router: Router, passport: PassportStatic): void {
@@ -46,12 +46,12 @@ interface JwtClaims {
 function _createJwt (claims: JwtClaims): string {
   /** This is what ends up in our JWT */
   const jwtClaims = {
-    iss: config.jwt.iss,
-    aud: config.jwt.aud,
+    iss: jwtConfig.iss,
+    aud: jwtConfig.aud,
     exp: Math.floor(Date.now() / 1000) + 86400, // 1 day (24×60×60=86400s) from now
     ...claims
   }
 
   /** generate a signed json web token and return it in the response */
-  return jwt.sign(jwtClaims, config.jwt.secret)
+  return jwt.sign(jwtClaims, jwtConfig.secret)
 }

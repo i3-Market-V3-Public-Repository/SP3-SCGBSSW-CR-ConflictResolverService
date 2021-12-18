@@ -4,7 +4,6 @@
 
 # Conflict Resolver Service
 
-
 The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about the non-repudiation protocol associated to an invoice being valid or invalid. It could be invoked by either the consumer or the provider.
 
 It is a core element of the Conflict Resolution system in i3-MARKET. [Read more here](./conflict-resolution.md).
@@ -30,13 +29,14 @@ A verification request as a compact JSON Web Signature (JWS) along with the publ
 }
 ```
 
-A verification request is a JWS signed by either the consumer or the provider using the same key he/she used for the data exchange. It holds either a valid PoR or a valid PoP associated to the data exchange to be verified. Either proof is enough to verify the data exchange and check if the secret was published to the ledger.
+A verification request is a JWS signed by either the consumer or the provider using the same key he/she used for the data exchange. The verification request payload holds a valid PoR:
 
 ```typescript
 {
+  type: 'verificationRequest'
   iss: 'orig' | 'dest'
   iat: number // unix timestamp for issued at
-  proof: string // a compact JWS holding a PoR (if iss === 'dest') or a PoP (if iss === 'orig'). The proof MUST be signed with the same key used to sign this verificationRequest
+  por: string // a compact JWS holding a valid PoR. The por's exchange.orig or exchange.dest shold point to a public key that can be used to verify this verificationRequest
 }
 ```
 
@@ -62,8 +62,6 @@ All this is handled in this endpoint, which can only be queried if in possession
 
 #### Input
 
-A dispute request as a compact JSON Web Signature (JWS) along with the public key to verify it. For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
-
 ```typescript
 {
   disputeRequest: string // the dispute request in compact JWS format
@@ -71,11 +69,16 @@ A dispute request as a compact JSON Web Signature (JWS) along with the public ke
 }
 ```
 
-A dispute request is a JWS signed by the consumer using the same key he/she used for the data exchange. It holds a valid PoR, and the received cipherblock.
+A dispute request as a compact JSON Web Signature (JWS) along with the public key to verify it. For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
+
+The payload of a decoded `disputeRequest` holds a valid PoR, and the received cipherblock:
 
 ```typescript
 {
-  por: string // a the PoR in compact JWS format
+  type: 'disputeRequest'
+  iss: 'dest'
+  iat: number // unix timestamp for issued at
+  por: string // a compact JWS holding a valid PoR. The por's exchange.orig or exchange.dest shold point to a public key that can be used to verify this verificationRequest
   cipherblock: string // the cipherblock as a JWE string
 }
 ```
@@ -89,7 +92,7 @@ It returns a signed resolution as a compact JWS with payload:
   type: 'dispute'
   dataExchangeId: string // the unique id of this data exchange
   resolution: 'accepted' | 'denied' // resolution is 'denied' if the cipherblock can be properly decrypted; otherwise is 'accepted'
-  iat: nume // unix timestamp stating when it was verified
+  iat: number // unix timestamp stating when it was verified
   iss: string // the public key of the CRS in JWK
 }
 ```
@@ -106,8 +109,8 @@ Once you have a token, use Postman or any other application to generate POST to 
 ```json
 {
    "application_type": "web",
-   "redirect_uris": ["https://mydomain.com/oidc/cb"],
-   "client_name": "Express OIDC RP Example",
+   "redirect_uris": ["https://<CRS PUBLIC DOMAIN>/oidc/cb"],
+   "client_name": "Conflict Resolver Service test 1",
    "grant_types": [ "authorization_code" ],
    "response_types": [ "code" ],
    "token_endpoint_auth_method": "client_secret_jwt",

@@ -30,7 +30,7 @@ function removeIgnoredPaths (spec: OpenAPIV3.Document): void {
 }
 
 const bundleSpec = async function (): Promise<OpenAPIV3.Document> {
-  const openApiPath = path.join(rootDir, 'spec', 'openapi.yaml')
+  const openApiPath = path.join(rootDir, 'spec-src', 'openapi.yaml')
 
   const parser = new SwaggerParser()
   const options: SwaggerParser.Options = {
@@ -59,15 +59,14 @@ const bundleSpec = async function (): Promise<OpenAPIV3.Document> {
 
 const bundle = async (): Promise<void> => {
   const api = await bundleSpec()
-  const pkgJson = await import(path.join(rootDir, 'package.json'))
 
-  fs.mkdirSync(pkgJson.directories.spec, { recursive: true })
+  const jsonBundle = path.join(rootDir, 'spec', 'openapi.json')
+  fs.mkdirSync(path.dirname(jsonBundle), { recursive: true })
 
-  const jsonBundle = path.join(rootDir, pkgJson.exports['./openapi.json'])
   fs.writeFileSync(jsonBundle, JSON.stringify(api, undefined, 2))
   console.info(`\x1b[32mOpenAPI Spec JSON bundle written to -> ${jsonBundle}\x1b[0m`)
 
-  const yamlBundle = path.join(rootDir, pkgJson.exports['./openapi.yaml'])
+  const yamlBundle = path.join(rootDir, 'spec', 'openapi.yaml')
   fs.writeFileSync(yamlBundle, jsYaml.dump(api))
   console.info(`\x1b[32mOpenAPI Spec YAML bundle written to -> ${yamlBundle}\x1b[0m`)
 }

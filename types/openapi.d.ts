@@ -18,7 +18,6 @@ export namespace OpenApiComponents {
          */
         export interface DisputeInput {
             disputeRequest: /* CompactJWS */ CompactJWS /* ^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$ */;
-            publicJwk: string;
         }
         /**
          * OidcCbOutput
@@ -56,7 +55,6 @@ export namespace OpenApiComponents {
          */
         export interface VerificationInput {
             verificationRequest: /* CompactJWS */ CompactJWS /* ^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$ */;
-            publicJwk: string;
         }
     }
 }

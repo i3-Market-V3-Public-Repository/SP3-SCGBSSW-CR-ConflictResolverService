@@ -7,7 +7,7 @@ import verification from './verification'
 const router = express.Router()
 
 export default async (): Promise<typeof router> => {
-  const passport = await passportPromise()
+  const passport = await passportPromise
 
   oidc(router, passport) // set up oidc routes
 

@@ -1,10 +1,7 @@
 import * as OpenApiValidator from 'express-openapi-validator'
-import pkgJson from '../package.json'
-
+import { openApiValidator } from '../config'
 export const openApiValidatorMiddleware = OpenApiValidator.middleware({
-  apiSpec: pkgJson.exports['./openapi.yaml'],
-  validateResponses: false, // <-- to validate responses
-  validateRequests: true // false by default
+  ...openApiValidator
   // formats: [
   //   {
   //     name: 'compact-jws',

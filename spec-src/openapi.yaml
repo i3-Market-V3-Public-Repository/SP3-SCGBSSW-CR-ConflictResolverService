@@ -1,0 +1,34 @@
+openapi: '3.0.2'
+info:
+  title: '{{pkgJson.name}} API'
+  version: '{{pkgJson.version}}'
+  description: '{{pkgJson.description}}'
+  contact:
+    name: '{{pkgJson.author.name}}'
+    email: '{{pkgJson.author.email}}'
+  license:
+    name: '{{pkgJson.license}}'
+paths:
+  /verification:
+    $ref: './paths/verification.yaml#/paths/~1verification'
+  
+  /dispute:
+    $ref: './paths/dispute.yaml#/paths/~1dispute'
+
+  /oidc/login/consumer:
+    $ref: './paths/oidc.yaml#/paths/~1oidc~1login~1consumer'
+
+  /oidc/login/provider:
+    $ref: './paths/oidc.yaml#/paths/~1oidc~1login~1provider'
+
+components:
+  securitySchemes:
+    BearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+  - name: Protected
+    description: Endpoints only available for i3-MARKET authenticated consumers/providers
+  - name: OpenID Connect

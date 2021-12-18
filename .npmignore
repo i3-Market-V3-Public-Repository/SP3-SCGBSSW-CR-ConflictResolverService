@@ -1,0 +1,15 @@
+.vscode
+build
+config
+middlewares
+node_modules
+routes
+spec
+spec-src
+test
+.env*
+.git*
+*.tgz
+**/*.ts
+!types/*.ts
+tsconfig*

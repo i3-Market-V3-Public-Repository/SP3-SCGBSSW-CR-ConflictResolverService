@@ -3,19 +3,16 @@ import crypto from 'crypto'
 import express, { Request, Response } from 'express'
 import { Express } from 'express-serve-static-core'
 import session from 'express-session'
+import { readFileSync, writeFileSync } from 'fs'
 import http from 'http'
 import morgan from 'morgan'
+import { join } from 'path/posix'
 import { serve, setup } from 'swagger-ui-express'
 import { server as serverConfig } from './config'
-import apiSpec from './spec/openapi.json'
+import { oidc } from './config/oidc'
 import passportPromise from './passport'
 import routesPromise from './routes'
-
-import { oidc } from './config/oidc'
-import { readFileSync, writeFileSync } from 'fs'
-import { join } from 'path/posix'
-
-const rootDir = join(__dirname, '..')
+import apiSpec from './spec/openapi.json'
 
 async function startApp (): Promise<Express> {
   const app = express()
@@ -93,9 +90,9 @@ function makeOpenApiWorkWithOurOidc (): void {
       replacement: oidc.providerUri + '/.well-known/openid-configuration'
     }
   ]
-  const openApiJsonPath = join(rootDir, 'spec', 'openapi.json')
+  const openApiJsonPath = join(__dirname, 'spec', 'openapi.json')
   let openApiJson = readFileSync(openApiJsonPath, 'utf-8')
-  const openApiYamlPath = join(rootDir, 'spec', 'openapi.yaml')
+  const openApiYamlPath = join(__dirname, 'spec', 'openapi.yaml')
   let openApiYaml = readFileSync(openApiYamlPath, 'utf-8')
 
   for (const replacement of replacements) {

@@ -13,3 +13,4 @@ test/
 **/*.ts
 !types/*.ts
 tsconfig*
+Dockerfile

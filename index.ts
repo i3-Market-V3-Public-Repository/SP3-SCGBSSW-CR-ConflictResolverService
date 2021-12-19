@@ -3,16 +3,12 @@ import crypto from 'crypto'
 import express, { Request, Response } from 'express'
 import { Express } from 'express-serve-static-core'
 import session from 'express-session'
-import { readFileSync, writeFileSync } from 'fs'
 import http from 'http'
 import morgan from 'morgan'
-import { join } from 'path/posix'
-import { serve, setup } from 'swagger-ui-express'
-import { server as serverConfig } from './config'
-import { oidc } from './config/oidc'
+import { JsonObject, serve, setup } from 'swagger-ui-express'
+import { server as serverConfig, openApi } from './config'
 import passportPromise from './passport'
 import routesPromise from './routes'
-import apiSpec from './spec/openapi.json'
 
 async function startApp (): Promise<Express> {
   const app = express()
@@ -26,20 +22,21 @@ async function startApp (): Promise<Express> {
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
   app.use(morgan('dev'))
-  app.use(passport.initialize())
+
+  if (passport !== undefined) app.use(passport.initialize())
   // app.use(passport.session())
 
   // Serve openapi
   app.use('/openapi.json', (req: Request, res: Response): void => {
-    res.json(apiSpec)
+    res.json(openApi.apiSpec)
   })
-  app.use('/spec', serve, setup(apiSpec))
-
-  // Install the OpenApiValidator for the routes
-  app.use((await import('./middlewares/openapi')).openApiValidatorMiddleware)
+  app.use('/spec', serve, setup(openApi.apiSpec as JsonObject))
 
   // Load CORS for the routes
   app.use((await import('./middlewares/cors')).corsMiddleware)
+
+  // Install the OpenApiValidator for the routes
+  app.use((await import('./middlewares/openapi')).openApiValidatorMiddleware)
 
   // Load routes
   app.use('/', await routesPromise())
@@ -51,8 +48,6 @@ async function startApp (): Promise<Express> {
 }
 
 const serverPromise = new Promise<http.Server>((resolve, reject) => {
-  makeOpenApiWorkWithOurOidc()
-
   startApp().then((app) => {
   /**
    * Listen on .env SERVER_PORT or 3000/tcp, on all network interfaces.
@@ -78,28 +73,3 @@ const serverPromise = new Promise<http.Server>((resolve, reject) => {
 })
 
 export default serverPromise
-
-function makeOpenApiWorkWithOurOidc (): void {
-  interface Replacement {
-    searchValue: string
-    replacement: string
-  }
-  const replacements: Replacement[] = [
-    {
-      searchValue: 'openIdWellKnownUri',
-      replacement: oidc.providerUri + '/.well-known/openid-configuration'
-    }
-  ]
-  const openApiJsonPath = join(__dirname, 'spec', 'openapi.json')
-  let openApiJson = readFileSync(openApiJsonPath, 'utf-8')
-  const openApiYamlPath = join(__dirname, 'spec', 'openapi.yaml')
-  let openApiYaml = readFileSync(openApiYamlPath, 'utf-8')
-
-  for (const replacement of replacements) {
-    const regex = new RegExp(replacement.searchValue, 'g')
-    openApiJson = openApiJson.replace(regex, replacement.replacement)
-    openApiYaml = openApiYaml.replace(regex, replacement.replacement)
-  }
-  writeFileSync(openApiJsonPath, openApiJson)
-  writeFileSync(openApiYamlPath, openApiYaml)
-}

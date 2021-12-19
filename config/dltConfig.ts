@@ -1,13 +1,12 @@
 import { defaultDltConfig } from '@i3m/non-repudiation-library'
 import { config as loadEnvFile } from 'dotenv'
 import { existsSync } from 'fs'
-import { nullish } from './nullish'
+import { parseProccessEnvVar } from './parseProcessEnvVar'
 
 if (existsSync('./.env')) loadEnvFile()
 
 const dltConfig = defaultDltConfig
-if (!nullish(process.env.DLT_RPC_PROVIDER_URL)) {
-  dltConfig.rpcProviderUrl = process.env.DLT_RPC_PROVIDER_URL as string
-}
+const parsedRpcProviderUrl = parseProccessEnvVar('DLT_RPC_PROVIDER_URL') as string
+if (parsedRpcProviderUrl !== '') dltConfig.rpcProviderUrl = parsedRpcProviderUrl
 
 export { dltConfig }

@@ -8,17 +8,98 @@ The Conflict-Resolver Service (CSR) can be queried to provide a signed resolutio
 
 It is a core element of the Conflict Resolution system in i3-MARKET. [Read more here](./conflict-resolution.md).
 
-## Endpoints
+- [1. Setup](#1-setup)
+  - [1.1. NPM](#11-npm)
+  - [1.2. Docker](#12-docker)
+- [2. Endpoints](#2-endpoints)
+  - [2.1. ```POST /verification```](#21-post-verification)
+    - [2.1.1. Input](#211-input)
+    - [2.1.2. Output](#212-output)
+  - [2.2. ```POST /dispute```](#22-post-dispute)
+    - [2.2.1. Input](#221-input)
+    - [2.2.2. Output](#222-output)
+- [[Additional help] Set up the OIDC RP/client](#additional-help-set-up-the-oidc-rpclient)
+
+## 1. Setup
+
+### 1.1. NPM
+
+You need access to the i3-MARKET NPM repository. If not already setup, create a file `.npmrc` with the following contents:
+
+```text
+registry=http://***REMOVED***:8081/repository/i3m-npm-proxy
+@i3m:registry=http://***REMOVED***:8081/repository/i3m-npm-registry
+```
+
+Now from the same directory, install the service as:
+
+```console
+npm install @i3m/conflict-resolver-service
+```
+
+Copy [`.env.template`](./.env.template) into that directory and name it `.env`.
+
+Fill in the required variables (it is self-explanatory).
+
+You need a pair of private/public keys in JWK format. If you don't have them, you can create them as:
+
+- [new keys] `npx generateJwks ES256`
+- [using a privatekey in hex] `node generateJwks ES256 <your private key in hex>`
+
+> Just call `npx generateJwks -h` for further help.
+
+You may also need to set up a valid OIDC client/RP and fill `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, and `OIDC_TOKEN_SIGNING_ALG`. Refer to [Setting up an OIDC RP](#additional-help-set-up-the-oidc-rpclient) for further help.
+
+Run your conflict-resolution service as:
+
+```console
+npx crs
+```
+
+### 1.2. Docker
+
+Download [`Dockerfile`](./Dockerfile) to a directory. From that directory, built it as:
+
+```console
+docker build -t crs . 
+```
+
+Now copy [`.env.template`](./.env.template) into that directory and name it `.env`.
+
+Fill in the required variables (it is self-explanatory).
+
+You need a pair of private/public keys in JWK format. If you don't have them, you can create them as:
+
+- [new keys] `docker run -it --init crs generateJwks ES256 generateJwks ES256`
+- [using a privatekey in hex] `docker run -it --init crs generateJwks ES256 <your private key in hex>`
+
+> Just call `docker run -it --init crs generateJwks -h` for further help.
+
+You may also need to set up a valid OIDC client/RP and fill `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, and `OIDC_TOKEN_SIGNING_ALG`. Refer to [Set up the OIDC RP](#additional-help-set-up-the-oidc-rpclient) for further help.
+
+Run your conflict-resolution service as:
+
+```console
+docker run -it --init -p 127.0.0.1:3000:3000 --env-file .env crs
+```
+
+> Notice that we are just exposing `localhost` at tcp port 3000. Use the configuration you need. In production, you will likely have it behind a reverse proxy providing TLS.
+
+## 2. Endpoints
 
 The Conflict-Resolver Service provides two endpoints: one for checking that the protocol was executed properly, and other one to initiate a dispute when a Consumer B claims that he cannot decrypt the cipherblock he has been invoiced for.
 
-### ```POST /verification```
+Check the [OpenApi specification](./spec/openapi.yaml) for more details.
+
+The endpoints require JWT bearer authentication. The JWT can be obtained after performing a login with OIDC and presenting valid i3-MARKET credentials.
+
+### 2.1. ```POST /verification```
 
 The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about a data exchanged successfully performed or not. It could be invoked by either the consumer or the provider. The provider should query this endpoint and send it along with the invoice to the consumer.
 
 This endpoint can be accessed at `POST /verification` and is requires valid i3-MARKET Consumer or Provider's credentials.
 
-#### Input
+#### 2.1.1. Input
 
 A verification request as a compact JSON Web Signature (JWS). For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
 
@@ -41,7 +122,7 @@ A verification request is a JWS signed by either the consumer or the provider us
 }
 ```
 
-#### Output
+#### 2.1.2. Output
 
 It returns a signed resolution as a compact JWS with payload:
 
@@ -57,13 +138,13 @@ It returns a signed resolution as a compact JWS with payload:
 }
 ```
 
-### ```POST /dispute```
+### 2.2. ```POST /dispute```
 
 Notice that the signed resolution obtained from `POST /verification` does not ensure that the published secret could be used to decrypt the encrypted block of data. If the consumer B is not able to decrypt the cipherblock, he could initiate a dispute on the CRS. The CRS will also provide signed resolution of whether B is right or not.
 
 All this is handled in this endpoint, which can only be queried if in possession of valid i3-MARKET Consumer's credentials.
 
-#### Input
+#### 2.2.1. Input
 
 ```typescript
 {
@@ -87,7 +168,7 @@ The payload of a decoded `disputeRequest` holds a valid PoR, and the received ci
 }
 ```
 
-#### Output
+#### 2.2.2. Output
 
 It returns a signed resolution as a compact JWS with payload:
 
@@ -103,9 +184,9 @@ It returns a signed resolution as a compact JWS with payload:
 }
 ```
 
-## Set up the service
+## [Additional help] Set up the OIDC RP/client
 
-If you haven't registered yet an OIDC client, point your browser to [https://identity1.i3-market.eu/release2/developers/login](https://identity1.i3-market.eu/release2/developers/login) and use the following credentials to get a valid initial access token for client registration:
+If you haven't registered yet an OIDC RP/client, point your browser to [https://identity1.i3-market.eu/release2/developers/login](https://identity1.i3-market.eu/release2/developers/login) and use the following credentials to get a valid initial access token for client registration:
 
 - username: `test@i3-market.eu`
 - password: `i3market`
@@ -157,15 +238,11 @@ The response will be something like:
 }
 ```
 
-Copy `env.template` to `.env` and fill the OIDC client metadata from those received, and set:
+Now uo are ready to fill the OIDC RP/Client variable in your `.env` file:
 
-- `OIDC_PROVIDER_URI` to `https://identity1.i3-market.eu/release2/oidc`,
-- `OIDC_CLIENT_ID` to received `client_id`,
-- `OIDC_CLIENT_SECRET` to `client_secret`,
-- `TOKEN_SIGNING_ALG` to `id_token_signed_response_alg`. 
-
-Besides the OIDC you may need to define the public uri of your server, since it is likely that you run this service behind a TLS reverse proxy. Just set `PUBLIC_URI` to your server address.
-
-> If you find it more convenient, you can pass the previous variables as environment variables to node instead of using the `.env` file.
+- Set `OIDC_PROVIDER_URI` to `https://identity1.i3-market.eu/release2/oidc`,
+- Set `OIDC_CLIENT_ID` to the contents of the received `client_id`,
+- Set `OIDC_CLIENT_SECRET` to the contents of the received`client_secret`,
+- Set `OIDC_TOKEN_SIGNING_ALG` to the contents of the received `id_token_signed_response_alg`.
 
 Point your browser to `/oidc/login/consumer` to init a consumer login process, or to `/oidc/login/provider` to init the provider one. You will need to download the i3Market wallet. Once the process is completed, you will get a valid access token that you can use as a bearer token to access the protected endpoints `/verification` and `/dispute`.

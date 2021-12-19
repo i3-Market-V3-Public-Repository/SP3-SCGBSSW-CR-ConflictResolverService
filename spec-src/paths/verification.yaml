@@ -12,6 +12,8 @@ paths:
       summary: verification request of completness of non-repudiation protocol regarding a data exchange
       operationId: verification
       x-eov-operation-handler: routes/verification
+      security:
+        - BearerAuth: []
       requestBody:
         description: initiates a verification
         required: true
@@ -45,4 +47,3 @@ components:
       properties:
         verificationRequest:
           $ref: "../schema/compact-jws.yaml#/components/schemas/CompactJWS"
-        

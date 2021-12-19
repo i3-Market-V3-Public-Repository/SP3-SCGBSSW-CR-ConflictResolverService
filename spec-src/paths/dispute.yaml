@@ -12,6 +12,8 @@ paths:
       summary: initiate a dispute
       operationId: dispute
       x-eov-operation-handler: routes/dispute
+      security:
+        - BearerAuth: []
       requestBody:
         description: initiates a dispute
         required: true

@@ -1,81 +1,47 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "title": "@i3m/conflict-resolver-service API",
-    "version": "0.9.12",
-    "description": "The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about the non-repudiation protocol associated to an invoice being valid or invalid. It could be invoked by either the consumer or the provider.",
-    "contact": {
-      "name": "Juan Hernández Serrano",
-      "email": "j.hernandez@upc.edu"
-    },
+    "title": "Conflict-Resolver Service (CRS) API",
+    "version": "1.0",
+    "description": "The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about the non-repudiation protocol associated to an invoice being valid or invalid. It could be invoked by either the consumer or the provider. It is a core element of the Conflict Resolution system in i3-MARKET.",
     "license": {
       "name": "EUPL-1.2"
+    },
+    "contact": {
+      "name": "Juan Hernández Serrano",
+      "email": "j.hernandez@upc.edu",
+      "url": "https://github.com/juanelas"
     }
   },
-  "paths": {
-    "/verification": {
-      "post": {
-        "tags": [
-          "Protected"
-        ],
-        "summary": "verification request of completness of non-repudiation protocol regarding a data exchange",
-        "operationId": "verification",
-        "x-eov-operation-handler": "routes/verification",
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "description": "initiates a verification",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerificationInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "the ID and type of the created account",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SignedResolution"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      }
+  "servers": [
+    {
+      "url": "http://***REMOVED***:8888/"
     },
+    {
+      "url": "http://***REMOVED***:8888/"
+    },
+    {
+      "url": "http://***REMOVED***:8888/"
+    },
+    {
+      "url": "http://***REMOVED***:8888/"
+    }
+  ],
+  "paths": {
     "/dispute": {
       "post": {
+        "summary": "initiates a dispute claiiming that the cipherblock cannot be decrypted",
         "tags": [
-          "Protected"
+          "Conflict-Resolver Service"
         ],
-        "summary": "initiate a dispute",
-        "operationId": "dispute",
-        "x-eov-operation-handler": "routes/dispute",
         "security": [
           {
-            "BearerAuth": []
+            "openidConnect": [
+              "consumer"
+            ]
           }
         ],
         "requestBody": {
-          "description": "initiates a dispute",
           "required": true,
           "content": {
             "application/json": {
@@ -87,7 +53,7 @@
         },
         "responses": {
           "200": {
-            "description": "the ID and type of the created account",
+            "description": "It returns a signed resolution as a compact JWS with payload:\n\n```typescript\n{\n  proofType: 'resolution'\n  type: 'dispute'\n  resolution: 'accepted' | 'denied' // resolution is 'denied' if the cipherblock can be properly decrypted; otherwise is 'accepted'\n  dataExchangeId: string // the unique id of this data exchange\n  iat: number // unix timestamp stating when it was resolved\n  iss: string // the public key of the CRS in JWK\n  sub: string // the public key (JWK) of the entity that requested a resolution\n}\n```\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -109,73 +75,38 @@
         }
       }
     },
-    "/oidc/login/consumer": {
-      "get": {
+    "/verification": {
+      "post": {
         "tags": [
-          "OpenID Connect"
+          "Conflict-Resolver Service"
         ],
-        "summary": "starts a OIDC login flow for getting a valid JWT bearer token for an i3-MARKET consumer",
-        "responses": {
-          "302": {
-            "description": "redirection to the OIDC server auth endpoint"
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/oidc/login/provider": {
-      "get": {
-        "tags": [
-          "OpenID Connect"
-        ],
-        "summary": "starts a OIDC login flow for getting a valid JWT bearer token for an i3-MARKET provider",
-        "responses": {
-          "302": {
-            "description": "redirection to the OIDC server auth endpoint"
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/oidc/cb": {
-      "get": {
-        "tags": [
-          "OpenID Connect"
-        ],
-        "summary": "OIDC callback endpoint that will retrieve the access token and te ID token and provide an API JWT bearer token",
+        "summary": "verification request of completeness of non-repudiation protocol regarding a data exchange",
+        "description": "The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about a data exchanged successfully performed or not (completeness of the non-repudiation protocol). It could be invoked by either the consumer or the provider.\nA provider should query this endpoint to get a signed resolution to send along with the invoice to the consumer.\n",
         "security": [
           {
-            "OpenIdConnect": [
-              "vc:consumer",
-              "vc:provider"
+            "openidConnect": [
+              "consumer",
+              "provider"
             ]
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerificationInput"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "an API JWT bearer token to use to access the protected resources",
+            "description": "A signed resolution as a compact JWS with payload:\n\n```typescript\n{\n  proofType: 'resolution'\n  type: 'verification'\n  resolution: 'completed' | 'not completed' // whether the data exchange has been verified to be complete\n  dataExchangeId: string // the unique id of this data exchange\n  iat: number // unix timestamp stating when it was resolved\n  iss: string // the public key of the CRS in JWK\n  sub: string // the public key (JWK) of the entity that requested a resolution\n}\n```\n",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OidcCbOutput"
+                  "$ref": "#/components/schemas/SignedResolution"
                 }
               }
             }
@@ -195,68 +126,7 @@
     }
   },
   "components": {
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      },
-      "OpenIdConnect": {
-        "type": "openIdConnect",
-        "openIdConnectUrl": "{{openIdWellKnownUri}}"
-      }
-    },
     "schemas": {
-      "VerificationInput": {
-        "title": "VerificationInput",
-        "description": "Expected input is a verification request as a compact JSON Web Signature (JWS) along with the public key to verify it. For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.\n",
-        "type": "object",
-        "required": [
-          "verificationRequest"
-        ],
-        "properties": {
-          "verificationRequest": {
-            "$ref": "#/components/schemas/CompactJWS"
-          }
-        }
-      },
-      "DisputeInput": {
-        "title": "DisputeInput",
-        "description": "Expected input is a dispute request as a compact JSON Web Signature (JWS) along with the public key to verify it. For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.\n",
-        "type": "object",
-        "required": [
-          "disputeRequest"
-        ],
-        "properties": {
-          "disputeRequest": {
-            "$ref": "#/components/schemas/CompactJWS"
-          }
-        }
-      },
-      "OidcCbOutput": {
-        "title": "OidcCbOutput",
-        "description": "An API JWT bearer token that provides access to protected endpoints\n",
-        "type": "object",
-        "required": [
-          "disputeRequest",
-          "publicJwk"
-        ],
-        "properties": {
-          "jwtBearerToken": {
-            "$ref": "#/components/schemas/CompactJWS"
-          },
-          "allowedEndpoints": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "/verification",
-                "/dispute"
-              ]
-            }
-          }
-        }
-      },
       "SignedResolution": {
         "title": "SignedResolution",
         "type": "object",
@@ -265,9 +135,15 @@
         ],
         "properties": {
           "signedResolution": {
-            "description": "A signed resolution object as a compact JWS signed by the CRS. The payload of a resolution is:\n\n```typescript\n{\n  type: 'verification' | 'dispute'\n  dataExchangeId: string // the unique id of this data exchange\n  resolution: 'completed' | 'not completed' | 'accepted' | 'denied' // whether the data exchange has been verified to be complete ('completed' | 'not completed') or if a dispute has been 'accpeted' (valid claim) or 'denied'.\n  iat: nume // unix timestamp stating when it was verified\n  iss: string // the public key of the CRS in JWK\n}\n```\n"
+            "$ref": "#/components/schemas/CompactJWS"
           }
-        }
+        },
+        "description": "A signed resolution object as a compact JWS signed by the CRS. The payload of a resolution is:\n\n```typescript\n{\n  proofType: 'resolution'\n  type: 'verification' | 'dispute'\n  resolution: 'completed' | 'not completed' | 'accepted' | 'denied' \n  dataExchangeId: string // the unique id of this data exchange\n  iat: number // unix timestamp stating when it was resolved\n  iss: string // the public key of the CRS as a JWK\n  sub: string // the public key (JWK) of the entity that requested a resolution\n}\n```\n\nIf `type` is `verification`, `resolution` can be `completed` (the non-repudiation protocol has been verified to be completed) or `not completed`.\n\nIf `type` is `dispute`, `resolution` accepted (the CRS has verified that the cipherblock exchanged cannot be decrypted) or `denied`.\n"
+      },
+      "CompactJWS": {
+        "title": "CompactJWS",
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+$"
       },
       "ApiError": {
         "type": "object",
@@ -285,20 +161,32 @@
           }
         }
       },
-      "CompactJWS": {
-        "title": "CompactJWS",
-        "type": "string",
-        "pattern": "^[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+$"
+      "DisputeInput": {
+        "title": "DisputeInput",
+        "description": "A dispute request as a compact JSON Web Signature (JWS). For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.\n\nThe payload of a decoded `disputeRequest` holds a valid PoR, and the received cipherblock:\n\n```typescript\n{\n  proofType: 'request'\n  type: 'disputeRequest'\n  iss: 'dest'\n  cipherblock: string // the cipherblock as a JWE string\n  iat: number // unix timestamp for issued at\n  por: string // a compact JWS holding a PoR. The proof MUST be signed with the same key as either 'orig' or 'dest' of the payload proof.\n  dataExchangeId: string // the unique id of this data exchange\n}\n```\n",
+        "type": "object",
+        "required": [
+          "disputeRequest"
+        ],
+        "properties": {
+          "disputeRequest": {
+            "$ref": "#/components/schemas/CompactJWS"
+          }
+        }
+      },
+      "VerificationInput": {
+        "title": "VerificationInput",
+        "description": "A verification request is a JWS signed by either the consumer or the provider using the same key he/she used for the data exchange. The verification request payload holds a valid PoR:\n\n```typescript\n{\n  type: 'verificationRequest'\n  proofType: 'request'\n  iss: 'orig' | 'dest'\n  iat: number // unix timestamp for issued at\n  por: string // a compact JWS holding a PoR. The proof MUST be signed with the same key as either 'orig' or 'dest' of the payload proof.\n  dataExchangeId: string // the unique id of this data exchange\n}\n```\n",
+        "type": "object",
+        "required": [
+          "verificationRequest"
+        ],
+        "properties": {
+          "verificationRequest": {
+            "$ref": "#/components/schemas/CompactJWS"
+          }
+        }
       }
     }
-  },
-  "tags": [
-    {
-      "name": "Protected",
-      "description": "Endpoints only available for i3-MARKET authenticated consumers/providers"
-    },
-    {
-      "name": "OpenID Connect"
-    }
-  ]
+  }
 }

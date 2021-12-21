@@ -1,34 +1,190 @@
 openapi: '3.0.2'
 info:
-  title: '{{pkgJson.name}} API'
-  version: '{{pkgJson.version}}'
-  description: '{{pkgJson.description}}'
-  contact:
-    name: '{{pkgJson.author.name}}'
-    email: '{{pkgJson.author.email}}'
-  license:
-    name: '{{pkgJson.license}}'
+  title: Conflict-Resolver Service (CRS) API
+  version: '1.0'
+servers:
+  - url: http://***REMOVED***:8888/
+  - url: http://***REMOVED***:8888/
+  - url: http://***REMOVED***:8888/
+  - url: http://***REMOVED***:8888/
+
 paths:
-  /verification:
-    $ref: './paths/verification.yaml#/paths/~1verification'
-  
   /dispute:
-    $ref: './paths/dispute.yaml#/paths/~1dispute'
+    post:
+      summary: initiates a dispute claiiming that the cipherblock cannot be decrypted
+      tags:
+        - Conflict-Resolver Service
+      security:
+        - openidConnect:
+          - consumer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DisputeInput"
+      responses:
+        "200":
+          description: |
+            It returns a signed resolution as a compact JWS with payload:
 
-  /oidc/login/consumer:
-    $ref: './paths/oidc.yaml#/paths/~1oidc~1login~1consumer'
+            ```typescript
+            {
+              proofType: 'resolution'
+              type: 'dispute'
+              resolution: 'accepted' | 'denied' // resolution is 'denied' if the cipherblock can be properly decrypted; otherwise is 'accepted'
+              dataExchangeId: string // the unique id of this data exchange
+              iat: number // unix timestamp stating when it was resolved
+              iss: string // the public key of the CRS in JWK
+              sub: string // the public key (JWK) of the entity that requested a resolution
+            }
+            ```
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignedResolution"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  
+  /verification:
+    post:
+      tags:
+        - Conflict-Resolver Service
+      summary: verification request of completeness of non-repudiation protocol regarding a data exchange
+      description: >
+        The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about a data exchanged successfully performed or not (completeness of the non-repudiation protocol). It could be invoked by either the consumer or the provider.
+        
+        A provider should query this endpoint to get a signed resolution to send along with the invoice to the consumer.
+      security:
+        - openidConnect:
+          - consumer
+          - provider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerificationInput"
+      responses:
+        "200":
+          description: |
+            A signed resolution as a compact JWS with payload:
 
-  /oidc/login/provider:
-    $ref: './paths/oidc.yaml#/paths/~1oidc~1login~1provider'
+            ```typescript
+            {
+              proofType: 'resolution'
+              type: 'verification'
+              resolution: 'completed' | 'not completed' // whether the data exchange has been verified to be complete
+              dataExchangeId: string // the unique id of this data exchange
+              iat: number // unix timestamp stating when it was resolved
+              iss: string // the public key of the CRS in JWK
+              sub: string // the public key (JWK) of the entity that requested a resolution
+            }
+            ```
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignedResolution"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 
 components:
-  securitySchemes:
-    BearerAuth:            # arbitrary name for the security scheme
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+  schemas:
+    SignedResolution:
+      title: SignedResolution
+      type: object
+      required:
+        - signedResolution
+      properties:
+        signedResolution:
+          $ref: "#/components/schemas/CompactJWS"
+      description: |
+        A signed resolution object as a compact JWS signed by the CRS. The payload of a resolution is:
+        
+        ```typescript
+        {
+          proofType: 'resolution'
+          type: 'verification' | 'dispute'
+          resolution: 'completed' | 'not completed' | 'accepted' | 'denied' 
+          dataExchangeId: string // the unique id of this data exchange
+          iat: number // unix timestamp stating when it was resolved
+          iss: string // the public key of the CRS as a JWK
+          sub: string // the public key (JWK) of the entity that requested a resolution
+        }
+        ```
 
-tags:
-  - name: Protected
-    description: Endpoints only available for i3-MARKET authenticated consumers/providers
-  - name: OpenID Connect
+        If `type` is `verification`, `resolution` can be `completed` (the non-repudiation protocol has been verified to be completed) or `not completed`.
+
+        If `type` is `dispute`, `resolution` accepted (the CRS has verified that the cipherblock exchanged cannot be decrypted) or `denied`.
+    
+    CompactJWS:
+      title: CompactJWS
+      type: string
+      pattern: '^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$'
+    
+    ApiError:
+      type: object
+      title: Error
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    DisputeInput:
+      title: DisputeInput
+      description: |
+        A dispute request as a compact JSON Web Signature (JWS). For the request to be accepted, it MUST be signed with the same key it was used during the data exchange for this verification.
+
+        The payload of a decoded `disputeRequest` holds a valid PoR, and the received cipherblock:
+
+        ```typescript
+        {
+          proofType: 'request'
+          type: 'disputeRequest'
+          iss: 'dest'
+          cipherblock: string // the cipherblock as a JWE string
+          iat: number // unix timestamp for issued at
+          por: string // a compact JWS holding a PoR. The proof MUST be signed with the same key as either 'orig' or 'dest' of the payload proof.
+          dataExchangeId: string // the unique id of this data exchange
+        }
+        ```
+      type: object
+      required:
+        - disputeRequest
+      properties:
+        disputeRequest:
+          $ref: "#/components/schemas/CompactJWS"
+
+    VerificationInput:
+      title: VerificationInput
+      description: |
+        A verification request is a JWS signed by either the consumer or the provider using the same key he/she used for the data exchange. The verification request payload holds a valid PoR:
+
+        ```typescript
+        {
+          type: 'verificationRequest'
+          proofType: 'request'
+          iss: 'orig' | 'dest'
+          iat: number // unix timestamp for issued at
+          por: string // a compact JWS holding a PoR. The proof MUST be signed with the same key as either 'orig' or 'dest' of the payload proof.
+          dataExchangeId: string // the unique id of this data exchange
+        }
+        ```
+      type: object
+      required:
+        - verificationRequest
+      properties:
+        verificationRequest:
+          $ref: "#/components/schemas/CompactJWS"

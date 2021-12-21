@@ -8,13 +8,11 @@
 # Run the Conflict Resolution Service: docker run -it --init -p 127.0.0.1:3000:3000 --env-file .env crs
 FROM node:lts AS build
 
-ENV NODE_ENV=${NODE_ENV:-production} DISABLE_JWT_AUTH=${DISABLE_JWT_AUTH:-0}
+ENV NODE_ENV=${NODE_ENV:-production}
 
-ENV SERVER_PORT=${SERVER_PORT:-3000} SERVER_ADDRESS=${SERVER_ADDRESS:+0.0.0.0} SERVER_PUBLIC_URI=${SERVER_PUBLIC_URI}
+ENV SERVER_PORT=${SERVER_PORT:-3000} SERVER_ADDRESS=${SERVER_ADDRESS:+0.0.0.0}
 
 ENV CORS_ACCESS_CONTROL_ALLOW_ORIGIN=${CORS_ACCESS_CONTROL_ALLOW_ORIGIN:-*}
-
-ENV OIDC_DISBLE=${OIDC_DISABLE:-0} OIDC_PROVIDER_URI=${OIDC_PROVIDER_URI} OIDC_CLIENT_ID=${OIDC_CLIENT_ID} OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET} OIDC_TOKEN_SIGNING_ALG=${OIDC_TOKEN_SIGNING_ALG:-EdDSA}
 
 ENV PRIVATE_JWK={PRIVATE_JWK} PUBLIC_JWK={PUBLIC_JWK}
 
@@ -23,8 +21,7 @@ ENV DLT_RPC_PROVIDER_URL=${DLT_RPC_PROVIDER_URL:-http://***REMOVED***:8545}
 WORKDIR /app
 RUN chown node.node /app
 USER node
-RUN echo "registry=http://***REMOVED***:8081/repository/i3m-npm-proxy\n@i3m:registry=http://***REMOVED***:8081/repository/i3m-npm-registry" > .npmrc \
-  && npm i --production @i3m/conflict-resolver-service
+RUN echo "registry=http://***REMOVED***:8081/repository/i3m-npm-proxy\n@i3m:registry=http://***REMOVED***:8081/repository/i3m-npm-registry" > .npmrc
 EXPOSE ${SERVER_PORT}
-ENTRYPOINT [ "npx" ]
+ENTRYPOINT [ "npx", "--package=@i3m/conflict-resolver-service" ]
 CMD [ "crs" ]

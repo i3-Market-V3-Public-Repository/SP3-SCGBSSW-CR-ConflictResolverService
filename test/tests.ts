@@ -34,7 +34,7 @@ describe('Conflict-Resolver Service', function () {
           verificationRequest
         })
       console.log(res.body)
-      const verificationResponse = res.body as OpenApiPaths.Verification.Responses.$200
+      const verificationResponse = res.body as OpenApiPaths.Verification.Post.Responses.$200
       const { payload } = await ConflictResolution.verifyResolution<VerificationResolutionPayload>(verificationResponse.signedResolution)
       expect(payload.resolution).to.equal('completed')
     })
@@ -49,7 +49,7 @@ describe('Conflict-Resolver Service', function () {
           disputeRequest
         })
       console.log(res.body)
-      const disputeResponse = res.body as OpenApiPaths.Dispute.Responses.$200
+      const disputeResponse = res.body as OpenApiPaths.Dispute.Post.Responses.$200
       const { payload } = await ConflictResolution.verifyResolution<DisputeResolutionPayload>(disputeResponse.signedResolution)
       expect(payload.resolution).to.equal('denied')
     })

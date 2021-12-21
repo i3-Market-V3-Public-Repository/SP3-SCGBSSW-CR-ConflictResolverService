@@ -1,14 +1,15 @@
 import fs from 'fs'
 import path from 'path'
 
-import dtsGenerator, { parseSchema } from 'dtsgenerator'
+import dtsGenerator, { JsonSchema, parseSchema } from 'dtsgenerator'
 import ts from 'typescript'
 
 import pkgJson from '../package.json'
+import spec from '../spec/openapi.json'
 
 const rootDir = path.join(__dirname, '..')
 
-const openApiJsonPath = path.join(rootDir, 'spec', 'openapi.json')
+const openApiPath = path.join(rootDir, 'spec', 'openapi.yaml')
 
 const typesFilePath = path.join(rootDir, pkgJson.directories.types, 'openapi.d.ts')
 const dstDir = path.dirname(typesFilePath)
@@ -17,11 +18,10 @@ const nameSpace = 'OpenApi'
 
 const generateDTS = async (): Promise<void> => {
   fs.mkdirSync(dstDir, { recursive: true })
-  const spec = JSON.parse(fs.readFileSync(openApiJsonPath, 'utf-8'))
   const configFile = ts.readJsonConfigFile(path.join(rootDir, 'tsconfig.json'), (file) => fs.readFileSync(file, 'utf-8'))
   const parsedTsConfig = ts.parseJsonSourceFileConfigFileContent(configFile, ts.sys, rootDir)
   const generatedContent = await dtsGenerator({
-    contents: [parseSchema(spec)],
+    contents: [parseSchema(spec as JsonSchema)],
     config: {
       target: parsedTsConfig.options.target,
       plugins: {
@@ -48,7 +48,7 @@ const generateDTS = async (): Promise<void> => {
       if (err !== null) {
         return console.trace(err)
       }
-      console.info(`\x1b[32m${openApiJsonPath}: TS definitions generated in -> ${typesFilePath}\x1b[0m`)
+      console.info(`\x1b[32m${openApiPath}: TS definitions generated in -> ${typesFilePath}\x1b[0m`)
     }
   )
 }

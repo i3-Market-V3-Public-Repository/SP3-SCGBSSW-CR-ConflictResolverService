@@ -1,36 +1,15 @@
 #!/usr/bin/env node
-import crypto from 'crypto'
-import express, { Request, Response } from 'express'
+import express from 'express'
 import { Express } from 'express-serve-static-core'
-import session from 'express-session'
 import http from 'http'
 import morgan from 'morgan'
-import { JsonObject, serve, setup } from 'swagger-ui-express'
-import { server as serverConfig, openApi } from './config'
-import passportPromise from './passport'
+import { server as serverConfig } from './config'
 import routesPromise from './routes'
 
 async function startApp (): Promise<Express> {
   const app = express()
-  const passport = await passportPromise
-
-  app.use(session({
-    secret: crypto.randomBytes(32).toString('base64'),
-    resave: false,
-    saveUninitialized: false
-  }))
   app.use(express.json())
-  app.use(express.urlencoded({ extended: false }))
   app.use(morgan('dev'))
-
-  if (passport !== undefined) app.use(passport.initialize())
-  // app.use(passport.session())
-
-  // Serve openapi
-  app.use('/openapi.json', (req: Request, res: Response): void => {
-    res.json(openApi.apiSpec)
-  })
-  app.use('/spec', serve, setup(openApi.apiSpec as JsonObject))
 
   // Load CORS for the routes
   app.use((await import('./middlewares/cors')).corsMiddleware)
@@ -53,17 +32,16 @@ const serverPromise = new Promise<http.Server>((resolve, reject) => {
    * Listen on .env SERVER_PORT or 3000/tcp, on all network interfaces.
    */
     const server = http.createServer(app)
-    const { port, addr, publicUri } = serverConfig
+    const { port, addr } = serverConfig
     server.listen(port, addr)
 
     /**
     * Event listener for HTTP server "listening" event.
     */
     server.on('listening', function (): void {
-      console.log(`Listening on http://localhost:${port}`)
-      console.log(`Listening on public ${publicUri}`)
-      console.log(`OpenAPI JSON spec at ${publicUri}/openapi.json`)
-      console.log(`OpenAPI browsable spec at ${publicUri}/spec`)
+      console.log('Listening ...')
+      // console.log(`OpenAPI JSON spec at ${publicUri}/openapi.json`)
+      // console.log(`OpenAPI browsable spec at ${publicUri}/spec`)
       resolve(server)
     })
   }).catch((e) => {

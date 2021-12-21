@@ -8,14 +8,14 @@
 # Run the Conflict Resolution Service: docker run -it --init -p 127.0.0.1:3000:3000 --env-file .env crs
 FROM node:lts
 
-ENV NODE_ENV=${NODE_ENV:-production}
-ENV VERSION=${VERSION:-latest}
+# VERSION can be used to build docker with a specific NPM version of the @i3m/conflict-resolver-service
+ARG VERSION=latest
 
-ENV SERVER_PORT=${SERVER_PORT:-3000} SERVER_ADDRESS=${SERVER_ADDRESS:+0.0.0.0}
+ENV NODE_ENV=${NODE_ENV:-production}
 
 ENV CORS_ACCESS_CONTROL_ALLOW_ORIGIN=${CORS_ACCESS_CONTROL_ALLOW_ORIGIN:-*}
 
-ENV PRIVATE_JWK={PRIVATE_JWK} PUBLIC_JWK={PUBLIC_JWK}
+ENV CRS_PRIVATE_JWK=${CRS_PRIVATE_JWK} CRS_PUBLIC_JWK=${CRS_PUBLIC_JWK}
 
 ENV DLT_RPC_PROVIDER_URL=${DLT_RPC_PROVIDER_URL:-http://***REMOVED***:8545}
 
@@ -24,6 +24,6 @@ RUN chown node.node /app
 USER node
 RUN echo "registry=http://***REMOVED***:8081/repository/i3m-npm-proxy\n@i3m:registry=http://***REMOVED***:8081/repository/i3m-npm-registry" > .npmrc \
   && npm install @i3m/conflict-resolver-service@${VERSION}
-EXPOSE ${SERVER_PORT}
+EXPOSE 3000
 ENTRYPOINT [ "npx" ]
 CMD [ "crs" ]

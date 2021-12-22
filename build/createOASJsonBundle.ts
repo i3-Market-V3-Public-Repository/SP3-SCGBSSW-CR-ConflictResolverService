@@ -8,7 +8,17 @@ const rootDir = path.join(__dirname, '..')
 
 function fillWithPkgJsonData (spec: OpenAPIV3.Document): void {
   spec.info.description = pkgJson.description
-  spec.info.license = { name: pkgJson.license }
+  let licenseUrl = ''
+  switch (pkgJson.license) {
+    case 'EUPL':
+    case 'EUPL-1':
+    case 'EUPL-1.2':
+      licenseUrl = 'https://joinup.ec.europa.eu/sites/default/files/custom-page/attachment/2020-03/EUPL-1.2%20EN.txt'
+      break
+    default:
+      break
+  }
+  spec.info.license = { name: pkgJson.license, url: licenseUrl }
   spec.info.contact = {
     name: pkgJson.author.name,
     email: pkgJson.author.email,

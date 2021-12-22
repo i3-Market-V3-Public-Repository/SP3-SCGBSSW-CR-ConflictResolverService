@@ -5,7 +5,8 @@
     "version": "1.0",
     "description": "The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about the non-repudiation protocol associated to an invoice being valid or invalid. It could be invoked by either the consumer or the provider. It is a core element of the Conflict Resolution system in i3-MARKET.",
     "license": {
-      "name": "EUPL-1.2"
+      "name": "EUPL-1.2",
+      "url": "https://joinup.ec.europa.eu/sites/default/files/custom-page/attachment/2020-03/EUPL-1.2%20EN.txt"
     },
     "contact": {
       "name": "Juan Hernández Serrano",
@@ -33,13 +34,6 @@
         "summary": "initiates a dispute claiiming that the cipherblock cannot be decrypted",
         "tags": [
           "Conflict-Resolver Service"
-        ],
-        "security": [
-          {
-            "openidConnect": [
-              "consumer"
-            ]
-          }
         ],
         "requestBody": {
           "required": true,
@@ -82,14 +76,6 @@
         ],
         "summary": "verification request of completeness of non-repudiation protocol regarding a data exchange",
         "description": "The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about a data exchanged successfully performed or not (completeness of the non-repudiation protocol). It could be invoked by either the consumer or the provider.\nA provider should query this endpoint to get a signed resolution to send along with the invoice to the consumer.\n",
-        "security": [
-          {
-            "openidConnect": [
-              "consumer",
-              "provider"
-            ]
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {

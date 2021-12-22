@@ -7,16 +7,12 @@ servers:
   - url: http://***REMOVED***:8888/
   - url: http://***REMOVED***:8888/
   - url: http://***REMOVED***:8888/
-
 paths:
   /dispute:
     post:
       summary: initiates a dispute claiiming that the cipherblock cannot be decrypted
       tags:
         - Conflict-Resolver Service
-      security:
-        - openidConnect:
-          - consumer
       requestBody:
         required: true
         content:
@@ -59,10 +55,6 @@ paths:
         The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about a data exchanged successfully performed or not (completeness of the non-repudiation protocol). It could be invoked by either the consumer or the provider.
         
         A provider should query this endpoint to get a signed resolution to send along with the invoice to the consumer.
-      security:
-        - openidConnect:
-          - consumer
-          - provider
       requestBody:
         required: true
         content:

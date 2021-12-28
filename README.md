@@ -8,7 +8,7 @@ The Conflict-Resolver Service (CSR) can be queried to provide a signed resolutio
 
 Check the OAS specification at [CRS OAS](spec/openapi.yaml).
 
-It is a core element of the Conflict Resolution system in i3-MARKET. [Read more here](./conflict-resolution.md).
+It is a core element of the Conflict Resolution system in i3-MARKET. [Read more here](https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/documentation#conflict-resolution-non-repudiation-protocol).
 
 - [1. Endpoints](#1-endpoints)
   - [1.1. ```POST /verification```](#11-post-verification)

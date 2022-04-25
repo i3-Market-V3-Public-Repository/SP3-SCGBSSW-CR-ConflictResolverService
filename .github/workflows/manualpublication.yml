@@ -27,11 +27,8 @@ jobs:
       
       - name: build tsc
         run: npm run tsc
-      
-      - name: docs
-        run: npm run docs
-      
-      - name: tests
+
+      - name: test
         run: npm run test
       
       - name: publish to NPM

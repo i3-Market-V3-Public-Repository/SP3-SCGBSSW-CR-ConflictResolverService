@@ -33,11 +33,8 @@ jobs:
       
       - name: build tsc
         run: npm run tsc
-      
-      - name: docs
-        run: npm run docs
-      
-      - name: tests
+       
+      - name: test
         run: npm run test
 
   publication:
@@ -70,10 +67,6 @@ jobs:
       - name: build tsc
         if: steps.check.outputs.changed == 'true'
         run: npm run tsc
-      
-      - name: docs
-        if: steps.check.outputs.changed == 'true'
-        run: npm run docs
       
       - name: publish to NPM
         if: steps.check.outputs.changed == 'true'

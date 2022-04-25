@@ -24,6 +24,9 @@
     "i3-MARKET",
     "i3m"
   ],
+  "engines": {
+    "node": ">=16"
+  },
   "main": "./dist/index.js",
   "bin": {
     "crs": "./dist/index.js",

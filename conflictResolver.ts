@@ -1,4 +1,4 @@
-import { ConflictResolution, parseJwk, verifyKeyPair, EthersWalletAgentDest } from '@i3m/non-repudiation-library'
+import { ConflictResolution, parseJwk, verifyKeyPair, EthersIoAgentDest } from '@i3m/non-repudiation-library'
 import { dltConfig } from './config'
 import { parseProccessEnvVar } from './config/parseProcessEnvVar'
 
@@ -10,7 +10,7 @@ async function generateCrs (): Promise<ConflictResolution.ConflictResolver> {
   const publicJwk = await parseJwk(JSON.parse(parsedPublicJwk), false)
   await verifyKeyPair(publicJwk, privateJwk)
 
-  const wallet = new EthersWalletAgentDest(dltConfig)
+  const wallet = new EthersIoAgentDest(dltConfig)
 
   return new ConflictResolution.ConflictResolver({ publicJwk, privateJwk }, wallet)
 }

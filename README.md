@@ -8,7 +8,7 @@ The Conflict-Resolver Service (CSR) can be queried to provide a signed resolutio
 
 Check the OAS specification at [CRS OAS](spec/openapi.yaml).
 
-It is a core element of the Conflict Resolution system in i3-MARKET. [Read more here](https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/documentation#conflict-resolution-non-repudiation-protocol).
+It is a core element of the Conflict Resolution system in i3-MARKET. [Read more here](https://github.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-Documentation#conflict-resolution--non-repudiation-protocol).
 
 - [1. Endpoints](#1-endpoints)
   - [1.1. ```POST /verification```](#11-post-verification)
@@ -126,14 +126,7 @@ You can get a local instance (for development) up and running with NPM or Docker
 
 ### 2.1. NPM
 
-You need access to the i3-MARKET NPM repository. If not already setup, create a file `.npmrc` with the following contents:
-
-```text
-registry=http://***REMOVED***:8081/repository/i3m-npm-proxy
-@i3m:registry=http://***REMOVED***:8081/repository/i3m-npm-registry
-```
-
-Now from the same directory, install the service as:
+Install the service as:
 
 ```console
 npm install @i3m/conflict-resolver-service
@@ -149,6 +142,8 @@ You need a pair of private/public keys in JWK format. If you don't have them, yo
 - [using a privatekey in hex] `node generateJwks ES256 <your private key in hex>`
 
 > Just call `npx generateJwks -h` for further help.
+
+You must also state an RPC endpoint for accessing the ledger `RPC_PROVIDER_URL`
 
 Run your conflict-resolution service as:
 

@@ -15,11 +15,6 @@ info:
     name: Juan Hernández Serrano
     email: j.hernandez@upc.edu
     url: https://github.com/juanelas
-servers:
-  - url: http://***REMOVED***:8888/
-  - url: http://***REMOVED***:8888/
-  - url: http://***REMOVED***:8888/
-  - url: http://***REMOVED***:8888/
 paths:
   /dispute:
     post:

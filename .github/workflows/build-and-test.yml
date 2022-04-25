@@ -1,0 +1,82 @@
+name: build
+
+on:
+  push:
+    branches: [ public ]
+
+env:
+  RPC_PROVIDER_URL: ${{ secrets.RPC_PROVIDER_URL }}
+  CRS_PRIVATE_JWK: ${{ secrets.CRS_PRIVATE_JWK }}
+  CRS_PUBLIC_JWK: ${{ secrets.CRS_PUBLIC_JWK }}  
+
+jobs:
+  build:
+    name: build and node tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        node-version: [14.x, 16.x, 18.x]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: install
+        run: npm ci
+      
+      - name: build openapi
+        run: npm run openapi
+      
+      - name: build tsc
+        run: npm run tsc
+      
+      - name: docs
+        run: npm run docs
+      
+      - name: tests
+        run: npm run test
+
+  publication:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: EndBug/version-check@v1
+        id: check
+
+      - name: check version changes
+        if: steps.check.outputs.changed == 'true'
+        run: 'echo "Version change found! New version: ${{ steps.check.outputs.version }} (${{ steps.check.outputs.type }})"'
+
+      - uses: actions/setup-node@v1
+        if: steps.check.outputs.changed == 'true'
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      
+      - name: install
+        if: steps.check.outputs.changed == 'true'
+        run: npm ci
+      
+      - name: build openapi
+        if: steps.check.outputs.changed == 'true'
+        run: npm run openapi
+      
+      - name: build tsc
+        if: steps.check.outputs.changed == 'true'
+        run: npm run tsc
+      
+      - name: docs
+        if: steps.check.outputs.changed == 'true'
+        run: npm run docs
+      
+      - name: publish to NPM
+        if: steps.check.outputs.changed == 'true'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

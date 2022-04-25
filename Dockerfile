@@ -17,13 +17,12 @@ ENV CORS_ACCESS_CONTROL_ALLOW_ORIGIN=${CORS_ACCESS_CONTROL_ALLOW_ORIGIN:-*}
 
 ENV CRS_PRIVATE_JWK=${CRS_PRIVATE_JWK} CRS_PUBLIC_JWK=${CRS_PUBLIC_JWK}
 
-ENV DLT_RPC_PROVIDER_URL=${DLT_RPC_PROVIDER_URL:-http://***REMOVED***:8545}
+ENV RPC_PROVIDER_URL=${RPC_PROVIDER_URL}
 
 WORKDIR /app
 RUN chown node.node /app
 USER node
-RUN echo "registry=http://***REMOVED***:8081/repository/i3m-npm-proxy\n@i3m:registry=http://***REMOVED***:8081/repository/i3m-npm-registry" > .npmrc \
-  && npm install @i3m/conflict-resolver-service@${VERSION}
+RUN npm install @i3m/conflict-resolver-service@${VERSION}
 EXPOSE 3000
 ENTRYPOINT [ "npx" ]
 CMD [ "crs" ]

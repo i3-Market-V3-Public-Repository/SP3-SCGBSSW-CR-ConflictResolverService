@@ -4,9 +4,8 @@ stages:
   - deploy
 
 variables:
-  NEXUS_REGISTRY: "***REMOVED***:8123"
   NEXUS_IMAGE_TAG: $NEXUS_REGISTRY/crs:latest
-  URL_DEPLOY_CRS: "http://***REMOVED***:19000/api/v2/job_templates/36/launch/"
+  RPC_PROVIDER_URL: $RPC_PROVIDER_URL
 
 build-npm:
   stage: npm

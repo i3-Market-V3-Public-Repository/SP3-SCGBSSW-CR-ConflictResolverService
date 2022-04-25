@@ -1,0 +1,40 @@
+name: publish
+
+on:
+  workflow_dispatch:
+
+env:
+  RPC_PROVIDER_URL: ${{ secrets.RPC_PROVIDER_URL }}
+  CRS_PRIVATE_JWK: ${{ secrets.CRS_PRIVATE_JWK }}
+  CRS_PUBLIC_JWK: ${{ secrets.CRS_PUBLIC_JWK }}  
+
+jobs:
+  publication:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      
+      - name: install
+        run: npm ci
+      
+      - name: build openapi
+        run: npm run openapi
+      
+      - name: build tsc
+        run: npm run tsc
+      
+      - name: docs
+        run: npm run docs
+      
+      - name: tests
+        run: npm run test
+      
+      - name: publish to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

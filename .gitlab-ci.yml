@@ -1,42 +1,31 @@
-stages:
-  - npm
-  - docker
-  - deploy
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: always
+    - when: never
 
 variables:
   NEXUS_IMAGE_TAG: $NEXUS_REGISTRY/crs:latest
   RPC_PROVIDER_URL: $RPC_PROVIDER_URL
+  DOCKER_DAEMON_OPTIONS: "--insecure-registry=$NEXUS_REGISTRY"
 
-build-npm:
-  stage: npm
-  image: node:lts
-  script:
-    - npm ci
-    - npm run build
-    - npm publish
-  rules:
-    - if: $CI_COMMIT_TAG != null
-
-build-docker:
-  stage: docker
-  image: docker
+build:
+  stage: build
+  image:
+    name: docker
   services:
       - name: docker:dind
-        entrypoint: ["sh", "-c", "dockerd-entrypoint.sh --insecure-registry=$NEXUS_REGISTRY"]
+        entrypoint: [ "sh", "-c", "dockerd-entrypoint.sh $DOCKER_DAEMON_OPTIONS" ]
   before_script:
-    - docker login $NEXUS_REGISTRY -u $NEXUS_USER -p $NEXUS_PASSWORD
+    - echo "$NEXUS_PASSWORD" | docker login --username "$NEXUS_USER" --password-stdin "$NEXUS_REGISTRY"
   script:
-    - docker build -t $NEXUS_IMAGE_TAG .
-    - docker push $NEXUS_IMAGE_TAG
+    - docker build -t $NEXUS_REGISTRY/$NEXUS_IMAGE_TAG .
+    - docker push $NEXUS_REGISTRY/$NEXUS_IMAGE_TAG
   after_script:
-    - docker logout $NEXUS_REGISTRY
-  rules:
-    - if: $CI_COMMIT_TAG != null
+    - docker logout "$NEXUS_REGISTRY"
 
 deploy:
   stage: deploy
   script:
     - 'curl --request POST --header "Authorization: Bearer $ANSIBLE_DEPLOY_TOKEN" "$URL_DEPLOY_CRS"'
-  rules:
-    - if: $CI_COMMIT_TAG != null
     

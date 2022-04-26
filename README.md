@@ -6,7 +6,7 @@
 
 The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about the non-repudiation protocol associated to an invoice being valid or invalid. It could be invoked by either the consumer or the provider.
 
-Check the OAS specification at [CRS OAS](spec/openapi.yaml).
+Check the OAS specification at [CRS OAS](https://github.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-ConflictResolverService/blob/public/spec/openapi.yaml).
 
 It is a core element of the Conflict Resolution system in i3-MARKET. [Read more here](https://github.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-Documentation#conflict-resolution--non-repudiation-protocol).
 
@@ -25,7 +25,7 @@ It is a core element of the Conflict Resolution system in i3-MARKET. [Read more 
 
 The Conflict-Resolver Service provides two endpoints: one for checking that the protocol was executed properly, and other one to initiate a dispute when a Consumer B claims that he cannot decrypt the cipherblock he has been invoiced for.
 
-Check the [OpenApi specification](./spec/openapi.yaml) for more details.
+Check the [OpenApi specification](https://github.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-ConflictResolverService/blob/public/spec/openapi.yaml) for more details.
 
 The endpoints require JWT bearer authentication. The JWT can be obtained after performing a login with OIDC and presenting valid i3-MARKET credentials.
 

@@ -10,12 +10,12 @@
   "license": "EUPL-1.2",
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver-service.git"
+    "url": "git+git@github.com:i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-ConflictResolverService.git"
   },
   "bugs": {
-    "url": "https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver-service/issues"
+    "url": "https://github.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-ConflictResolverService/issues"
   },
-  "homepage": "https://gitlab.com/i3-market/code/wp3/t3.2/conflict-resolution/conflict-resolver-service",
+  "homepage": "https://github.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-ConflictResolverService",
   "keywords": [
     "crs",
     "conflict resolution",
@@ -25,7 +25,7 @@
     "i3m"
   ],
   "engines": {
-    "node": ">=16"
+    "node": "16.x"
   },
   "main": "./dist/index.js",
   "bin": {

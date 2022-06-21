@@ -19,8 +19,8 @@ build:
   before_script:
     - echo "$NEXUS_PASSWORD" | docker login --username "$NEXUS_USER" --password-stdin "$NEXUS_REGISTRY"
   script:
-    - docker build -t $NEXUS_REGISTRY/$NEXUS_IMAGE_TAG .
-    - docker push $NEXUS_REGISTRY/$NEXUS_IMAGE_TAG
+    - docker build -t $NEXUS_IMAGE_TAG .
+    - docker push $NEXUS_IMAGE_TAG
   after_script:
     - docker logout "$NEXUS_REGISTRY"
 

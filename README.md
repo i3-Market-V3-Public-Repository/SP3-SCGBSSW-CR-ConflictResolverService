@@ -4,7 +4,7 @@
 
 # Conflict Resolver Service
 
-The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about the non-repudiation protocol associated to an invoice being valid or invalid. It could be invoked by either the consumer or the provider.
+The Conflict-Resolver Service (CRS) can be queried to provide a signed resolution about the non-repudiation protocol associated to an invoice being valid or invalid. It could be invoked by either the consumer or the provider.
 
 Check the OAS specification at [CRS OAS](https://github.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-ConflictResolverService/blob/public/spec/openapi.yaml).
 
@@ -23,7 +23,7 @@ It is a core element of the Conflict Resolution system in i3-MARKET. [Read more 
 
 ## 1. Endpoints
 
-The Conflict-Resolver Service provides two endpoints: one for checking that the protocol was executed properly, and other one to initiate a dispute when a Consumer B claims that he cannot decrypt the cipherblock he has been invoiced for.
+The CRS provides two endpoints: one for checking that the protocol was executed properly, and other one to initiate a dispute when a Consumer B claims that he cannot decrypt the cipherblock he has been invoiced for.
 
 Check the [OpenApi specification](https://github.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-ConflictResolverService/blob/public/spec/openapi.yaml) for more details.
 
@@ -31,7 +31,7 @@ The endpoints require JWT bearer authentication. The JWT can be obtained after p
 
 ### 1.1. ```POST /verification```
 
-The Conflict-Resolver Service (CSR) can be queried to provide a signed resolution about a data exchanged successfully performed or not. It could be invoked by either the consumer or the provider. The provider should query this endpoint and send it along with the invoice to the consumer.
+The CRS can be queried to provide a signed resolution about a data exchanged successfully performed or not. It could be invoked by either the consumer or the provider. The provider should query this endpoint and send it along with the invoice to the consumer.
 
 This endpoint can be accessed at `POST /verification` and is requires valid i3-MARKET Consumer or Provider's credentials.
 
@@ -136,7 +136,7 @@ Copy [`template.env`](./template.env) into that directory and name it `.env`.
 
 Fill in the required variables (it is self-explanatory).
 
-You need a pair of private/public keys in JWK format. If you don't have them, you can create them as:
+You need a pair of private/public keys in JWK format. You have two options: 1) to let the server generate them when it is first started (leave the `CRS_PRIVATE_JWK` and `CRS_PUBLIC_JWK` empty); 2) create them as follows and adding the to your .env file.
 
 - [new keys] `npx generateJwks ES256`
 - [using a privatekey in hex] `node generateJwks ES256 <your private key in hex>`
@@ -145,7 +145,7 @@ You need a pair of private/public keys in JWK format. If you don't have them, yo
 
 You must also state an RPC endpoint for accessing the ledger `RPC_PROVIDER_URL`
 
-Run your conflict-resolution service as:
+Run your CRS as:
 
 ```console
 npx crs
@@ -163,14 +163,14 @@ Copy [`template.env`](./template.env) into that directory and name it `.env`.
 
 Fill in the required variables (it is self-explanatory).
 
-You need a pair of private/public keys in JWK format. If you don't have them, you can create them as:
+You need a pair of private/public keys in JWK format. You have two options: 1) to let the server generate them when it is first started (leave the `CRS_PRIVATE_JWK` and `CRS_PUBLIC_JWK` empty); 2) create them as follows and adding the to your .env file.
 
 - [new keys] `docker run -it --init crs generateJwks ES256`
 - [using a privatekey in hex] `docker run -it --init crs generateJwks ES256 <your private key in hex>`
 
 > Just call `docker run -it --init crs generateJwks -h` for further help.
 
-Run your conflict-resolution service as:
+Run your CRS as:
 
 ```console
 docker run -it --init -p 127.0.0.1:3000:3000 --env-file .env crs

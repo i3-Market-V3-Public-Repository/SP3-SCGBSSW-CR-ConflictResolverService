@@ -172,8 +172,17 @@ You need a pair of private/public keys in JWK format. You have two options: 1) t
 
 Run your CRS as:
 
-```console
-docker run -it --init -p 127.0.0.1:3000:3000 --env-file .env crs
-```
+- If you are using env variables for you JWKs:
+
+    ```console
+    docker run -it --init -p 127.0.0.1:3000:3000 --env-file .env crs
+    ```
+
+- Otherwise, for your keys to persist you also need to mount a volume in the container's `/app/.keys`:
+
+    ```console
+    docker run -it --init -p 127.0.0.1:3000:3000 --env-file .env -v keys:/app/.keys crs
+    ```
+
 
 > Notice that we are just exposing `localhost` at tcp port 3000. Use the configuration you need. In production, you will likely have it behind a reverse proxy providing TLS.

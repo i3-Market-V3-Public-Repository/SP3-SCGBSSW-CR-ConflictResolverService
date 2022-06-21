@@ -22,7 +22,8 @@ ENV RPC_PROVIDER_URL=${RPC_PROVIDER_URL}
 WORKDIR /app
 RUN chown node.node /app
 USER node
-RUN npm install @i3m/conflict-resolver-service@${VERSION}
+RUN mkdir .keys && \
+    npm install @i3m/conflict-resolver-service@${VERSION}
 EXPOSE 3000
 ENTRYPOINT [ "npx" ]
 CMD [ "crs" ]

@@ -15,11 +15,11 @@ describe('Conflict-Resolver Service', function () {
 
   const url = `http://localhost:${serverConfig.port}`
 
-  this.beforeAll(async () => {
+  before(async () => {
     server = await serverPromise
   })
 
-  this.afterAll((done) => {
+  after((done) => {
     server.close((err) => {
       done(err)
     })

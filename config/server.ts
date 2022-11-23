@@ -10,6 +10,6 @@ interface ServerConfig {
 const port = Number(parseProccessEnvVar('SERVER_PORT', { defaultValue: '3000' }))
 
 export const server: ServerConfig = {
-  addr: parseProccessEnvVar('SERVER_ADDRESS', { defaultValue: '0.0.0.0' }) as string,
+  addr: parseProccessEnvVar('SERVER_ADDRESS', { defaultValue: '::' }) as string,
   port
 }

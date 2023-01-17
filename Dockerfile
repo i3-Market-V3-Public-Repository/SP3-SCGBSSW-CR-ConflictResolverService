@@ -4,7 +4,7 @@
 # Generate keys if you don't have a valid pair : 
 #  - [new keys] docker run -it --init crs generateJwks ES256
 #  - [using a privatekey in hex] docker run -it --init crs generateJwks ES256 8c2ebb279f950edec15d36f3d7b10a35858d9743f964489ec0ad8860e3e9423b
-# Copy .env.template to .env and fill all the required env variables. If OIDC login is enabled, you will need valid OIDC client/RP credentials first.
+# Copy template.env to .env and fill all the required env variables.
 # Run the Conflict Resolution Service: docker run -it --init -p 127.0.0.1:3000:3000 --env-file .env crs
 FROM node:18-alpine
 

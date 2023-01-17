@@ -2,8 +2,8 @@ import { ConflictResolution, DisputeResolutionPayload, VerificationResolutionPay
 import { expect, request, use } from 'chai'
 import chaiHttp from 'chai-http'
 import { Server } from 'http'
-import serverPromise from '..'
-import { server as serverConfig } from '../config'
+import serverPromise from '../src'
+import { server as serverConfig } from '../src/config'
 import { OpenApiPaths } from '../types/openapi'
 
 use(chaiHttp)

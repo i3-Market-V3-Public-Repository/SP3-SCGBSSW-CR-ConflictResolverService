@@ -36,13 +36,14 @@
     "build": "./build",
     "dist": "./dist",
     "types": "./types",
-    "spec": "./dist/spec"
+    "spec": "./dist/spec",
+    "spec-src": "./src/spec-src"
   },
   "exports": {
-    ".": "./dist/spec/openapi.json",
+    ".": "./dist/index.js",
     "./openapi.yaml": "./dist/spec/openapi.yaml",
     "./openapi.json": "./dist/spec/openapi.json",
-    "./types": "./types/openapi.d.ts"
+    "./oas-ts-types": "./types/openapi.d.ts"
   },
   "scripts": {
     "openapi": "run-s openapi:json openapi:types",
@@ -53,7 +54,7 @@
     "start": "node dist/index.js",
     "predev": "npm run openapi",
     "dev": "ts-node index.ts",
-    "clean": "rimraf dist spec/openapi.json spec/openapi.yaml",
+    "clean": "rimraf dist src/spec/openapi.json src/spec/openapi.yaml",
     "test": "mocha -r ts-node/register 'test/**/*.ts'",
     "git:add": "git add -A",
     "version": "run-s build test git:add",

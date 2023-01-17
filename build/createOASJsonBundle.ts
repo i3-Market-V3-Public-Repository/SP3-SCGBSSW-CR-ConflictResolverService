@@ -27,7 +27,7 @@ function fillWithPkgJsonData (spec: OpenAPIV3.Document): void {
 }
 
 const bundle = async (): Promise<void> => {
-  const openApiPath = path.join(rootDir, 'spec-src', 'openapi.yaml')
+  const openApiPath = path.join(rootDir, pkgJson.directories['spec-src'], 'openapi.yaml')
 
   let oasYaml = fs.readFileSync(openApiPath, 'utf-8')
   const oas = jsYaml.load(oasYaml) as OpenAPIV3.Document
@@ -38,18 +38,21 @@ const bundle = async (): Promise<void> => {
     return p1 + '\n' + jsYaml.dump(oas.info).replace(/^[\w\s]/gm, '  $&') + p3
   })
 
-  const oasJsonPath = path.join(rootDir, 'spec', 'openapi.json')
-  fs.mkdirSync(path.dirname(oasJsonPath), { recursive: true })
+  const oasJsonBundlePath = path.join(rootDir, 'src', 'spec', 'openapi.json')
+  const oasJsonBundleDistPath = path.join(rootDir, pkgJson.exports['./openapi.json']) // tsc does not automatically copy .yaml to dist/spec
+  fs.mkdirSync(path.dirname(oasJsonBundlePath), { recursive: true })
+  fs.mkdirSync(path.dirname(oasJsonBundleDistPath), { recursive: true })
 
-  fs.writeFileSync(oasJsonPath, JSON.stringify(oas, undefined, 2))
-  console.info(`\x1b[32mOpenAPI Spec JSON written to -> ${oasJsonPath}\x1b[0m`)
+  fs.writeFileSync(oasJsonBundlePath, JSON.stringify(oas, undefined, 2))
+  fs.writeFileSync(oasJsonBundleDistPath, JSON.stringify(oas, undefined, 2))
 
-  const yamlBundle = path.join(rootDir, 'spec', 'openapi.yaml')
-  const yamlBundleDist = path.join(rootDir, 'dist', 'spec', 'openapi.yaml') // tsc does not automatically copy .yaml to dist/spec
-  fs.mkdirSync(path.dirname(yamlBundleDist), { recursive: true })
-  fs.writeFileSync(yamlBundle, oasYaml)
-  fs.writeFileSync(yamlBundleDist, oasYaml)
-  console.info(`\x1b[32mOpenAPI Spec YAML bundle written to -> ${yamlBundle}\x1b[0m`)
+  console.info(`\x1b[32mOpenAPI Spec JSON written to -> ${oasJsonBundleDistPath}\x1b[0m`)
+
+  const oasYamlBundlePath = path.join(rootDir, 'src', 'spec', 'openapi.yaml')
+  const oasYamlBundleDistPath = path.join(rootDir, pkgJson.exports['./openapi.yaml']) // tsc does not automatically copy .yaml to dist/spec
+  fs.writeFileSync(oasYamlBundlePath, oasYaml)
+  fs.writeFileSync(oasYamlBundleDistPath, oasYaml)
+  console.info(`\x1b[32mOpenAPI Spec YAML bundle written to -> ${oasYamlBundleDistPath}\x1b[0m`)
 }
 
 export default bundle

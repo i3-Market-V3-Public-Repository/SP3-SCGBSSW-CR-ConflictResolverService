@@ -5,11 +5,11 @@ import dtsGenerator, { JsonSchema, parseSchema } from 'dtsgenerator'
 import ts from 'typescript'
 
 import pkgJson from '../package.json'
-import spec from '../spec/openapi.json'
+import spec from '../src/spec/openapi.json'
 
 const rootDir = path.join(__dirname, '..')
 
-const openApiPath = path.join(rootDir, 'spec', 'openapi.yaml')
+const openApiPath = path.join(rootDir, pkgJson.directories.spec, 'openapi.yaml')
 
 const typesFilePath = path.join(rootDir, pkgJson.directories.types, 'openapi.d.ts')
 const dstDir = path.dirname(typesFilePath)

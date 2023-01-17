@@ -1,11 +1,9 @@
-.vscode
+.github/
+.vscode/
 build/
-config/
-middlewares/
+coverage/
 node_modules/
-routes/
-spec/
-spec-src/
+src/
 test/
 *.env*
 .git*
@@ -16,5 +14,5 @@ tsconfig*
 Dockerfile
 CODE_OF_CONDUCT.md
 
-# generated JJWKs
+# generated JWKs
 .keys

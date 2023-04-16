@@ -8,8 +8,6 @@ test/
 *.env*
 .git*
 *.tgz
-**/*.ts
-!types/*.ts
 tsconfig*
 Dockerfile
 CODE_OF_CONDUCT.md

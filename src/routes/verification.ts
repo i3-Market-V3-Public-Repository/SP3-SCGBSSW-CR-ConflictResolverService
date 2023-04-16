@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import crsPromise from '../conflictResolver'
-import { OpenApiPaths } from '../../types/openapi'
+import type { OpenApiPaths } from '../openapi'
 
 export default function verification (router: Router): void {
   router.post('/verification',

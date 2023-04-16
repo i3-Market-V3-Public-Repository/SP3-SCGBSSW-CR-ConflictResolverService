@@ -27,8 +27,6 @@ The CRS provides two endpoints: one for checking that the protocol was executed 
 
 Check the OpenAPI specification at [CRS OAS](https://github.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-ConflictResolverService/blob/public/spec/openapi.yaml) or visualize it online at [editor.swagger.io](https://editor.swagger.io/?url=https://raw.githubusercontent.com/i3-Market-V2-Public-Repository/SP3-SCGBSSW-CR-ConflictResolverService/public/spec/openapi.yaml) for more details.
 
-The endpoints require JWT bearer authentication. The JWT can be obtained after performing a login with OIDC and presenting valid i3-MARKET credentials.
-
 ### 1.1. ```POST /verification```
 
 The CRS can be queried to provide a signed resolution about a data exchanged successfully performed or not. It could be invoked by either the consumer or the provider. The provider should query this endpoint and send it along with the invoice to the consumer.
@@ -139,7 +137,7 @@ Fill in the required variables (it is self-explanatory).
 You need a pair of private/public keys in JWK format. You have two options: 1) to let the server generate them when it is first started (leave the `CRS_PRIVATE_JWK` and `CRS_PUBLIC_JWK` empty); 2) create them as follows and adding the to your .env file.
 
 - [new keys] `npx generateJwks ES256`
-- [using a privatekey in hex] `node generateJwks ES256 <your private key in hex>`
+- [using a private key in hex] `node generateJwks ES256 <your private key in hex>`
 
 > Just call `npx generateJwks -h` for further help.
 
@@ -166,7 +164,7 @@ Fill in the required variables (it is self-explanatory).
 You need a pair of private/public keys in JWK format. You have two options: 1) to let the server generate them when it is first started (leave the `CRS_PRIVATE_JWK` and `CRS_PUBLIC_JWK` empty); 2) create them as follows and adding the to your .env file.
 
 - [new keys] `docker run -it --init crs generateJwks ES256`
-- [using a privatekey in hex] `docker run -it --init crs generateJwks ES256 <your private key in hex>`
+- [using a private key in hex] `docker run -it --init crs generateJwks ES256 <your private key in hex>`
 
 > Just call `docker run -it --init crs generateJwks -h` for further help.
 
@@ -183,6 +181,5 @@ Run your CRS as:
     ```console
     docker run -it --init -p 127.0.0.1:3000:3000 --env-file .env -v keys:/app/.keys crs
     ```
-
 
 > Notice that we are just exposing `localhost` at tcp port 3000. Use the configuration you need. In production, you will likely have it behind a reverse proxy providing TLS.

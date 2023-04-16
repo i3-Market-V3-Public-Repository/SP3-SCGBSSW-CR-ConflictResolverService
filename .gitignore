@@ -14,9 +14,6 @@ logs
 results
 tmp
 
-# Build
-public/css/main.css
-
 # Coverage reports
 coverage
 
@@ -43,3 +40,8 @@ yarn.lock
 
 # generated JWKs
 .keys
+
+# Automatically generated files
+src/spec/openapi.json
+src/spec/openapi.yaml
+src/openapi.ts

@@ -11,7 +11,7 @@ const rootDir = path.join(__dirname, '..')
 
 const openApiPath = path.join(rootDir, pkgJson.directories.spec, 'openapi.yaml')
 
-const typesFilePath = path.join(rootDir, pkgJson.directories.types, 'openapi.d.ts')
+const typesFilePath = path.join(rootDir, pkgJson.directories['types-src'], 'openapi.ts')
 const dstDir = path.dirname(typesFilePath)
 
 const nameSpace = 'OpenApi'
@@ -42,7 +42,7 @@ const generateDTS = async (): Promise<void> => {
   })
   fs.writeFile(
     typesFilePath,
-    generatedContent.replace(/; \/\//g, ' //').replace(/declare /g, '').replace(/namespace /g, 'export namespace '),
+    '/* eslint @typescript-eslint/no-namespace: 0 */\n' + generatedContent.replace(/; \/\//g, ' //').replace(/declare /g, '').replace(/namespace /g, 'export namespace '),
     { flag: 'w' },
     (err) => {
       if (err !== null) {

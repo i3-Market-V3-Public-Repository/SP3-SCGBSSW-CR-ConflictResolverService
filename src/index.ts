@@ -51,3 +51,5 @@ const serverPromise = new Promise<http.Server>((resolve, reject) => {
 })
 
 export default serverPromise
+
+export * as oasTypes from './openapi'

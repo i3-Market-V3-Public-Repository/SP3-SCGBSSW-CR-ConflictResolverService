@@ -4,7 +4,7 @@ import chaiHttp from 'chai-http'
 import { Server } from 'http'
 import serverPromise from '../src'
 import { server as serverConfig } from '../src/config'
-import { OpenApiPaths } from '../types/openapi'
+import type { OpenApiPaths } from '../src/openapi'
 
 use(chaiHttp)
 

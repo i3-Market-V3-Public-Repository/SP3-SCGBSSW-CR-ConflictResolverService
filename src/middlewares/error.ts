@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from 'express'
-import { HttpError } from 'express-openapi-validator/dist/framework/types'
-import { OpenApiComponents } from '../../types/openapi'
+import type { NextFunction, Request, Response } from 'express'
+import type { HttpError } from 'express-openapi-validator/dist/framework/types'
+import type { OpenApiComponents } from '../openapi'
 
 export function errorMiddleware (err: HttpError, req: Request, res: Response, next: NextFunction): void {
   if (req.path !== undefined) {

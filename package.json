@@ -91,10 +91,10 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@i3m/non-repudiation-library": "^2.0.0",
-    "dotenv": "^16.0.0",
-    "express": "^4.17.1",
-    "express-openapi-validator": "^5.0.3",
+    "@i3m/non-repudiation-library": "^2.6.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-openapi-validator": "^5.3.1",
     "morgan": "^1.10.0"
   }
 }
